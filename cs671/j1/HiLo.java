@@ -1,4 +1,4 @@
-package cs671.j1;
+package cs671;
 public class HiLo implements Guesser<Integer> {
     int min,max,x;
     double total;
