@@ -1,4 +1,4 @@
-package cs671;
+package cs671.j1;
 public class HiLo implements Guesser<Integer> {
     int min,max,x;
     double total;
@@ -6,7 +6,7 @@ public class HiLo implements Guesser<Integer> {
         this.max=max;
         this.min=min;
         this.x=(min+max)/2;
-        this.total=(max-min);
+        this.total=(double)(max-min);
     }
     public Integer getSecret(){
         return x;
@@ -33,7 +33,7 @@ public class HiLo implements Guesser<Integer> {
         min=x;
     }
     public double progress(){
-        Double current=(max-min);
+        Double current=(double)(max-min);
         return(current/total);
     }
 }
