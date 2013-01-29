@@ -1,10 +1,12 @@
 package cs671;
 public class HiLo implements Guesser<Integer> {
     int min,max,x;
+    double total;
     public HiLo(int min,int max){
         this.max=max;
         this.min=min;
         this.x=(min+max)/2;
+        this.total=(max-min);
     }
     public Integer getSecret(){
         return x;
@@ -21,7 +23,6 @@ public class HiLo implements Guesser<Integer> {
     }
     public String makeQuestion(){
         x=(min + max)/2; //might not work like this, b/c of rounding
-        //String formating unsure, use this.x as x for now
         String question=String.format("Is your number greater than %f",x);
         return question;
     }
@@ -32,6 +33,7 @@ public class HiLo implements Guesser<Integer> {
         min=x;
     }
     public double progress(){
-        return 0.0;
+        Double current=(max-min);
+        return(current/total);
     }
 }
