@@ -1,8 +1,8 @@
 SOURCES := $(wildcard j*/*.java)
-ONE := $(wildcard j1/*.java})
-TWO := $(wildcard j2/*.java})
-THREE := $(wildcard j3/*.java})
-FOUR := $(wildcard j4/*.java})
+ONE := $(wildcard j1/*.java)
+TWO := $(wildcard j2/*.java)
+THREE := $(wildcard j3/*.java)
+FOUR := $(wildcard j4/*.java)
 JAVAC := javac
 JAVAC_FLAGS := -sourcepath $(wildcard j*) -Xlint -d $(PWD)
 .PHONY: clean all 1 2 3 4
