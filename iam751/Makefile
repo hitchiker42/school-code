@@ -1,3 +1,5 @@
+CC= gcc
+CFLAGS= -Wall
 hello: hello.c factorial.c greeting.c
-	@gcc hello.c factorial.c greeting.c -o hello
+	@$(CC) $^ -o hello
 	@chmod +x hello
