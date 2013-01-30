@@ -35,8 +35,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
             }
         }
         void increment(boolean top){
-            t_b==true ? liarList=this.bottom : liarList=this.top;
+            liarList = (t_b==true) ? this.bottom : this.top;
             //do stuff
+        }
+        void swap(){
         }
         double progress(){
             //sum lies left per object over all objects

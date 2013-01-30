@@ -1,4 +1,4 @@
-package cs671;
+package cs671.j1;
 public class HiLo implements Guesser<Integer> {
     int min,max,x;
     double total;
@@ -23,11 +23,12 @@ public class HiLo implements Guesser<Integer> {
     }
     public String makeQuestion(){
         x=(min + max)/2; //might not work like this, b/c of rounding
-        String question=String.format("Is your number greater than %f",x);
+        String question=String.format("Is your number greater than %d",x);
         return question;
     }
     public void no(){
         max=x;
+
     }
     public void yes(){
         min=x;

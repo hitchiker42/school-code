@@ -1,4 +1,4 @@
-package cs671;
+package cs671.j1;
 public interface Guesser<T>{
     String initalize();
     T getSecret();
