@@ -9,7 +9,7 @@ class GuesserTextUI {
   Guesser<?> guesser;
   String question,answer;
   GuesserTextUI(Guesser<?> g){
-    this.output=new PrintWriter(System.out);
+    this.output=new PrintWriter(new OutputStreamWriter(System.out),true);
     this.input=new BufferedReader(new InputStreamReader(System.in));
     this.guesser=g;
   }
@@ -24,7 +24,7 @@ class GuesserTextUI {
     //Main Loop Goes here
     while (play==true){
       guesser.initalize();
-      while (guesser.hasSolved() == false){
+      while (guesser.hasSolved() != true ){
         question=guesser.makeQuestion();
         output.println(question);
         try{
@@ -32,24 +32,29 @@ class GuesserTextUI {
         } catch (IOException ex){
         }
         //insure input is cast to a string
-        if (answer.toLowerCase() == "y" || answer.toLowerCase() == "yes"){
+        if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
           guesser.yes();
-        } else if (answer.toLowerCase() == "n" || answer.toLowerCase() == "no"){
+        } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
           guesser.no();
         }
         else {
           //prompt for another answer
+          continue;
         }
+        double progress=guesser.progress();
+        output.println(String.format("I am %.0f %% complete",100*progress));
       }
+      String number=guesser.getSecret().toString(); //need to make generic
+      output.println(String.format("Your number was %s",number));
       games++;
       output.println("Play Again?(y/n)");
       try{
         answer=input.readLine();
       } catch (IOException ex){
       }
-      if (answer == "y" || answer.toLowerCase() == "yes"){
+      if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
         play=true;
-      } else if (answer == "n" || answer.toLowerCase() == "no"){
+      } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
         play=false;
       }
     }
@@ -62,11 +67,10 @@ class GuesserTextUI {
       +"or: TextUI -liar #lies -file filename #names\n"
       +"Options: -h,--help print this help and exit\n";
     System.out.println(usage);
-    System.exit(0);
+    return;
     }
   public static void main(String [] args) throws IOException{
     //Test this bit, I need to be surce this is the right way to do this
-    System.out.println("Start");
     if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help")){
       help();
     } else if (args[0].equals("-liar")){
@@ -76,7 +80,7 @@ class GuesserTextUI {
     //test for some option
     //GuesserTextUI game=new GuesserTextUI(new Liar());
     // game.play();
-    System.exit(0); //temp till I make Liar
+    return; //temp till I make Liar
     } else if (args[0].equals("-hilo")){
       if(args.length < 2){
         help();
@@ -84,7 +88,6 @@ class GuesserTextUI {
           int min= new Integer(args[1]);
           int max= new Integer(args[2]);
           GuesserTextUI game=new GuesserTextUI(new HiLo(min,max));
-          System.out.println("Playing");
           game.play();
         } catch(NumberFormatException ex){
           System.out.println("Arguments were not ints");

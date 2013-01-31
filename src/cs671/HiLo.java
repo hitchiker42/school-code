@@ -1,4 +1,5 @@
 package cs671;
+//NEEDS TO BE FIXED, SPECIFICALLY THE HAS SOLVED METHOD
 public class HiLo implements Guesser<Integer> {
     int min,max,x;
     double total;
@@ -27,14 +28,13 @@ public class HiLo implements Guesser<Integer> {
         return question;
     }
     public void no(){
-        max=x;
-
+        this.max=this.x;
     }
     public void yes(){
-        min=x;
+        this.min=this.x;
     }
     public double progress(){
         Double current=(double)(max-min);
-        return(current/total);
+        return(1-current/total);
     }
 }
