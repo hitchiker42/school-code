@@ -11,7 +11,7 @@ int main(int argv,char** args){
   int c;
   int result;
   opterr = 0;
-  while ((c = getopt (argv, args, "asm")) != -1){
+  while ((c = getopt (argv, args, "asmh")) != -1){
     switch(c) {
     case 'a':
       result=add_test(argv,args);
@@ -25,6 +25,9 @@ int main(int argv,char** args){
       result=vec_mult_test(argv,args);
       return result;
       break;
+    case 'h':
+      printf("usage:\n-a,vector additon\n-s,dot product\n-m,matrix multiplication\n-h,print this help and exit\n");
+      return 0;
     case '?':
       printf ("Unknown option `-%c'\n", optopt);
       return 2;

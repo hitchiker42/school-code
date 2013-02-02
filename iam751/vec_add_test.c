@@ -20,7 +20,7 @@ int add_test(int argv,char** args){
     }
     c=vec_add(a,b,c,n);
     for (int i=0;i<n;i++){
-      if(i==N/2){
+      if(i==n/2){
         printf("|%6.3f| + |%6.3f| = |%6.3f|\n",a[i],b[i],c[i]);
       } else{
         printf("|%6.3f|   |%6.3f|   |%6.3f|\n",a[i],b[i],c[i]);
