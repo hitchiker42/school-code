@@ -3,6 +3,9 @@
 package cs671;
 import java.io.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/
+/**
+   GuesserTextUi Class
+ */
 class GuesserTextUI {
   BufferedReader input;
   PrintWriter output;
@@ -23,7 +26,7 @@ class GuesserTextUI {
     int games=0;
     //Main Loop Goes here
     while (play==true){
-      guesser.initalize();
+      guesser.initialize();
       while (guesser.hasSolved() != true ){
         question=guesser.makeQuestion();
         output.println(question);
@@ -31,7 +34,6 @@ class GuesserTextUI {
           answer=input.readLine();
         } catch (IOException ex){
         }
-        //insure input is cast to a string
         if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
           guesser.yes();
         } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
@@ -58,29 +60,35 @@ class GuesserTextUI {
         play=false;
       }
     }
+    //check API if i have to return games like this do so
+    //but if i can print games and return 0
+    output.println(String.format("You played %d games",games));
     return games;
   }
+  /**
+     help method 
+     How to use the Program, prints on -h, --help or no args
+  */
   static void help() {
-    //How to use the Program, prints on -h, --help or no args
     String usage="Usage: TextUI -hilo min max\n"
       +"or: TextUI -liar #lies name1 [name2 ...]\n"
       +"or: TextUI -liar #lies -file filename #names\n"
       +"Options: -h,--help print this help and exit\n";
     System.out.println(usage);
     return;
-    }
+  }
   public static void main(String [] args) throws IOException{
     //Test this bit, I need to be surce this is the right way to do this
     if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help")){
       help();
     } else if (args[0].equals("-liar")){
-    //liar cases
-    //something= args[1]
-    //something= args[2]
-    //test for some option
-    //GuesserTextUI game=new GuesserTextUI(new Liar());
-    // game.play();
-    return; //temp till I make Liar
+      //liar cases
+      //something= args[1]
+      //something= args[2]
+      //test for some option
+      //GuesserTextUI game=new GuesserTextUI(new Liar());
+      // game.play();
+      return; //temp till I make Liar
     } else if (args[0].equals("-hilo")){
       if(args.length < 2){
         help();
@@ -95,7 +103,7 @@ class GuesserTextUI {
     }
     else {
       System.out.println("ERROR");
-      System.exit(1);
+      return;
     }
   }
 }
