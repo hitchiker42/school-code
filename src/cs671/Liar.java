@@ -4,19 +4,24 @@ import java.util.Collections.*;
 import java.util.EnumSet.*;
 import java.lang.reflect.*;
 public class Liar<T> implements Guesser<Liar.Secret<T>>{
+  static void println(String arg){
+    System.out.println(arg);
+  }
   LiarTable liarTable;
-  Integer mLies=new Integer(0);
-  String realName=new String("name");
-  public final int maxLies=mLies;
-  public final String name=realName;
   ArrayList<T> candidates;
   int items;
+  public final int maxLies;
+  public final String name;
   public boolean hasSolved(){
     return liarTable.hasSolved();
   }
   public double progress(){
     return(1-(liarTable.progress()/liarTable.total));
   }
+
+
+  //Type of Secrets, just used an interface to outside
+  //All internal manipulations done w/LiarTable
   static class Secret<E> {
     int lies;
     E secret;
@@ -34,6 +39,8 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       return String.format("Your object was %s and you told %d lies",secret,lies);//not sure how to format for generics, and should object be name?
     }
   }
+
+
   /**
      LiarTable class
      Data structure to hold information about items and lies
@@ -43,12 +50,13 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     TreeMap<Integer,ArrayList<T>> top;
     TreeMap<Integer,ArrayList<T>> bottom;
     TreeMap<Integer,ArrayList<T>> liarList;
+    double total;//# of total lies at star
     /**
        LiarTable Constructor
     */
     LiarTable(ArrayList<T> candidates,int lies){
-      this.top=new TreeMap();
-      this.bottom=new TreeMap();
+      this.top=new TreeMap<>();
+      this.bottom=new TreeMap<>();
       this.top.put(0,new ArrayList<T>(candidates.subList(0,items/2)));
       this.bottom.put(0,new ArrayList<T>(candidates.subList(items/2,items)));
       for (int i=1;i<lies;i++){
@@ -56,11 +64,14 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         this.bottom.put(i,new ArrayList<T>(items/2+items%2));
       }
       this.total=items*lies;
+      println(this.top.toString()+this.bottom.toString()+'\n');
     }
+
     /**
        Increment lies on top/bottom
     */
     void increment(boolean top){
+      println("increment\n");
       liarList = (top==true) ? this.bottom : this.top;
       //do stuff
       for (int i=(maxLies-1);i>0;i--){
@@ -68,6 +79,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       }
       liarList.get(0).clear();
     }
+
     /**
        Swap part of top and bottom w/each other
     */
@@ -76,28 +88,23 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       //move the first n/2+n%2 items from bottom to temp array
       //merge top and bottom, this is new top
       //temp array is new bottom
+      println("swap\n");
       for (int i=0;i<maxLies;i++){
-        final ArrayList up=this.top.get(i);
-        final ArrayList down=this.bottom.get(i);
-        final ArrayList temp=new ArrayList(up.size());
+        ArrayList<T> up=this.top.get(i);
+        ArrayList<T> down=this.bottom.get(i);
+        ArrayList<T> temp=new ArrayList<>(up.size());
         //with temp variables, Should this have a new namespace?
-        try{
-            Method m=up.getClass().getDeclaredMethod("removeRange",Integer.class,Integer.class);
-            m.setAccessible(true);
-            temp.addAll(up.subList(up.size()/2,up.size()));
-            m.invoke(up,up.size()/2,up.size());
-            //up.removeRange(up.size()/2,up.size());
-            temp.addAll(down.subList(0,(down.size()/2+down.size()%2)));
-            m.invoke(down,0,(down.size()/2+down.size()%2));
-            //down.removeRange(0,(down.size()/2+down.size()%2));
-            up.addAll(down);
-            //change real variables
-            top.put(i,up);
-            bottom.put(i,temp);
-        } catch(IllegalAccessException | InvocationTargetException | NoSuchMethodException ex){
-        }
+        temp.addAll(up.subList(up.size()/2,up.size()));
+        up.subList(up.size()/2,up.size()).clear();
+        temp.addAll(down.subList(0,(down.size()/2+down.size()%2)));
+        down.subList(0,(down.size()/2+down.size()%2)).clear();
+        up.addAll(down);
+        //change real variables
+        top.put(i,up);
+        bottom.put(i,temp);
       }
     }
+
     /**
        return progress as a double giving the total number
        of possible lies left, this is compaired w/the value
@@ -113,13 +120,15 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       }
       return sum;
     }
-    double total;//# of total lies at star
+
     /**
        if only 1 item left than we've solved the problem
        if not keep going
     */
     boolean hasSolved(){
+      println("hasSolved\n");
       int sum=top.get(0).size()+bottom.get(0).size();
+      println(String.format("sum:%d",sum));
       for (int i=1;i<maxLies;i++){
         if (sum>1){
           return false;
@@ -127,9 +136,16 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
           sum+=(top.get(i).size()+bottom.get(i).size());
         }
       }
+      if (sum==1){
+        return true;
+      }
+      println("What the hell happened");
+      System.exit(89);
       return true;
     }
   }
+
+  //Constructor
   public Liar(Set<? extends T> candidates, int lies, String name){
     items=candidates.size();
     try{
@@ -139,33 +155,44 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       throw new IllegalArgumentException();
     } catch (IllegalArgumentException ex){
     }
-    this.candidates=new ArrayList(candidates);
-    this.mLies=lies;
-    this.realName=name;
+    this.maxLies=lies;
+    this.name=name;
+    this.candidates=new ArrayList<>(candidates);
     this.liarTable=new LiarTable(this.candidates,lies);
   }
-    public Secret<T> getSecret(){
-      return(new Secret<T>(liarTable.top.firstKey(),liarTable.top.get(1).get(0)));
-//need a way to get this value from liarTable
+  //Get Secret
+  public Secret<T> getSecret(){
+    Secret<T> ans=null;
+    for (int i=0;i<maxLies;i++){
+      if (!liarTable.top.get(i).isEmpty()){
+        ans=new Secret<>(i,liarTable.top.get(i).get(0));
+        break;
+        }
+      if (!liarTable.bottom.get(i).isEmpty()){
+        ans=new Secret<>(i,liarTable.bottom.get(i).get(0));
+        break;
+        }
+    }
+    return(ans);
   }
 
 
   public String initialize(){
     //reset liarTable
-    this.liarTable=new LiarTable(new ArrayList(candidates),maxLies);
+    this.liarTable=new LiarTable(this.candidates,maxLies);
     return "";
   }
 
   public String makeQuestion(){
     StringBuilder question = new StringBuilder(String.format("Is your %s one of: ",name));
     for (ArrayList<T> i:liarTable.top.values()){
-      Iterator q = i.iterator();
+      Iterator<T> q = i.iterator();
       while (q.hasNext()){
         question.append(q.next());
         question.append(' ');
       }
     }
-    question.deleteCharAt(question.length());//length-1?
+    question.deleteCharAt(question.length()-1);//length-1?
     question.append('?');
     return question.toString();
   }
@@ -188,7 +215,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
     //Random rand=new Random();
     Collections.shuffle(candidates);
-    candidates=(ArrayList)candidates.subList(0,n);
+    candidates=(ArrayList<T>)candidates.subList(0,n);
     return n;
   }
 }
