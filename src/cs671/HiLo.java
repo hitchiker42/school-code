@@ -1,6 +1,4 @@
 package cs671;
-//NEEDS TO BE FIXED, SPECIFICALLY THE HAS SOLVED METHOD
-
 /**
    HiLo Class
  */
