@@ -1,7 +1,8 @@
 //For the guesser, might need to use g, and might need to call initalizer while parsing
 //command line arguements
 package cs671;
-import java.io.*;//For now, but simplify to only classes I need
+import java.io.*;
+import java.util.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/
 /**
    GuesserTextUi Class
@@ -83,11 +84,17 @@ class GuesserTextUI {
       help();
     } else if (args[0].equals("-liar")){
       //liar cases
-      //something= args[1]
-      //something= args[2]
-      //test for some option
-      //GuesserTextUI game=new GuesserTextUI(new Liar());
-      // game.play();
+      try{
+        int lies= new Integer(args[1]);
+        HashSet candidates = new HashSet();
+        for (int i=2;i<args.length;i++){
+          candidates.add(args[i]);
+        }
+        //test for some option
+        GuesserTextUI game=new GuesserTextUI(new Liar(candidates,lies,"name"));
+        game.play();
+      } catch(NumberFormatException ex){
+      }
       return; //temp till I make Liar
     } else if (args[0].equals("-hilo")){
       if(args.length < 2){
