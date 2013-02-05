@@ -11,8 +11,8 @@ public class HiLo implements Guesser<Integer> {
     static int min;
     static int max;
     Range(int min,int max){
-      this.min=min;
-      this.max=max;
+      Range.min=min;
+      Range.max=max;
     }
   }
   public HiLo(int min,int max){
@@ -36,8 +36,8 @@ public class HiLo implements Guesser<Integer> {
     }
   }
   public String initialize(){
-    max=range.max;
-    min=range.min;
+    max=Range.max;
+    min=Range.min;
     return "";
   }
   public String makeQuestion(){

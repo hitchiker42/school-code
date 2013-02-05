@@ -8,6 +8,11 @@ import java.util.*;//For now, but simplify to only classes I need
    GuesserTextUi Class
  */
 class GuesserTextUI {
+  //I'm lazy and this makes printing things eaiser
+  static void println(String arg){
+    System.out.println(arg);
+  }
+
   BufferedReader input;
   PrintWriter output;
   Guesser<?> guesser;
@@ -84,14 +89,21 @@ class GuesserTextUI {
       help();
     } else if (args[0].equals("-liar")){
       //liar cases
+      if (args.length<3){
+        System.out.println("Not Enough Arguements");
+        return;
+      }
       try{
         int lies= new Integer(args[1]);
-        HashSet candidates = new HashSet();
+        
+        HashSet<String> candidates = new HashSet<>();
         for (int i=2;i<args.length;i++){
           candidates.add(args[i]);
         }
         //test for some option
-        GuesserTextUI game=new GuesserTextUI(new Liar(candidates,lies,"name"));
+        println(candidates.toString());
+        GuesserTextUI game=new GuesserTextUI(new Liar<>(candidates,lies,"name"));
+        assert(!game.equals(null));
         game.play();
       } catch(NumberFormatException ex){
       }
