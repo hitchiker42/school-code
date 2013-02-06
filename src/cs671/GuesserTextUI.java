@@ -95,7 +95,6 @@ class GuesserTextUI {
       }
       try{
         int lies= new Integer(args[1]);
-        
         HashSet<String> candidates = new HashSet<>();
         for (int i=2;i<args.length;i++){
           candidates.add(args[i]);
