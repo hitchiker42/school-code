@@ -59,7 +59,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       this.bottom=new TreeMap<>();
       this.top.put(0,new ArrayList<T>(candidates.subList(0,items/2)));
       this.bottom.put(0,new ArrayList<T>(candidates.subList(items/2,items)));
-      for (int i=1;i<lies;i++){
+      for (int i=1;i<=lies;i++){
         this.top.put(i,new ArrayList<T>(items/2+items%2));
         this.bottom.put(i,new ArrayList<T>(items/2+items%2));
       }
@@ -70,14 +70,30 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     /**
        Increment lies on top/bottom
     */
-    void increment(boolean top){
+    @SuppressWarnings("unchecked")
+    void increment(boolean inTop){
       println("increment\n");
-      liarList = (top==true) ? this.bottom : this.top;
-      //do stuff
-      for (int i=(maxLies-1);i>0;i--){
-        liarList.put(i,liarList.get(i-1));
+      //might use teritary operator here, but removed for debugging
+      TreeMap<Integer,ArrayList<T>> liarList;
+      if (inTop==true){
+        liarList=bottom;
+      } else {
+        liarList=top;
       }
+      //println(liarList.toString());
+      ArrayList<T> temp;
+      //do stuff
+      for (int i=maxLies;i>0;i--){
+        try{
+        temp=(ArrayList<T>)liarList.get(i-1).clone();
+        liarList.put(i,temp);
+        } catch(ClassCastException ex){
+        }
+      }
+      //temp=liarList.get(0);...keeping just in case
       liarList.get(0).clear();
+      //println(top.toString());
+      //println(bottom.toString());
     }
 
     /**
@@ -89,20 +105,32 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       //merge top and bottom, this is new top
       //temp array is new bottom
       println("swap\n");
-      for (int i=0;i<maxLies;i++){
-        ArrayList<T> up=this.top.get(i);
-        ArrayList<T> down=this.bottom.get(i);
-        ArrayList<T> temp=new ArrayList<>(up.size());
+      println("before\n"+top.toString()+'\n'+bottom.toString());
+      ArrayList<T> up;
+      ArrayList<T> down;
+      ArrayList<T> temp;
+      for (int i=0;i<=maxLies;i++){
+        up=top.get(i);
+        down=bottom.get(i);
+        temp=new ArrayList<>(up.size());
         //with temp variables, Should this have a new namespace?
-        temp.addAll(up.subList(up.size()/2,up.size()));
-        up.subList(up.size()/2,up.size()).clear();
-        temp.addAll(down.subList(0,(down.size()/2+down.size()%2)));
-        down.subList(0,(down.size()/2+down.size()%2)).clear();
-        up.addAll(down);
+        if (down.size()==1){
+          up.addAll(down);
+          down.clear();
+        } else if (up.size()==1 && i!=maxLies){
+          continue;
+        } else {
+          temp.addAll(up.subList(up.size()/2,up.size()));
+          up.subList(up.size()/2,up.size()).clear();
+          temp.addAll(down.subList(0,(down.size()/2+down.size()%2)));
+          down.subList(0,(down.size()/2+down.size()%2)).clear();
+          up.addAll(down);
+        }
         //change real variables
         top.put(i,up);
         bottom.put(i,temp);
       }
+      println("After\n"+top.toString()+'\n'+bottom.toString());
     }
 
     /**
@@ -114,7 +142,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     double progress(){
       //sum lies left per object over all objects
       double sum=0;
-      for(int i=0;i<maxLies;i++){
+      for(int i=0;i<=maxLies;i++){
         sum += top.get(i).size()*(maxLies-i);
         sum += bottom.get(i).size()*(maxLies-i);
       }
@@ -129,19 +157,21 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       println("hasSolved\n");
       int sum=top.get(0).size()+bottom.get(0).size();
       println(String.format("sum:%d",sum));
-      for (int i=1;i<maxLies;i++){
+      for (int i=1;i<=maxLies;i++){
         if (sum>1){
           return false;
-        } else {
-          sum+=(top.get(i).size()+bottom.get(i).size());
         }
+        sum+=(top.get(i).size()+bottom.get(i).size());
       }
-      if (sum==1){
+      if (sum>1){
+        return false;
+      } else if (sum==1){
+        return true;
+      } else {
+        println("What the hell happened");
+        System.exit(89);
         return true;
       }
-      println("What the hell happened");
-      System.exit(89);
-      return true;
     }
   }
 
@@ -163,7 +193,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   //Get Secret
   public Secret<T> getSecret(){
     Secret<T> ans=null;
-    for (int i=0;i<maxLies;i++){
+    for (int i=0;i<=maxLies;i++){
       if (!liarTable.top.get(i).isEmpty()){
         ans=new Secret<>(i,liarTable.top.get(i).get(0));
         break;
@@ -200,11 +230,13 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   public void no(){
     //add 1 lie to each entry in top and remove any with lies>maxlies
     liarTable.increment(false);
+    liarTable.swap();
   }
 
   public void yes(){
     //add 1 lie to each entry in bottom and remove any with lies>maxlies
     liarTable.increment(true);
+    liarTable.swap();
   }
 
   public int selectCandidates(int n){
