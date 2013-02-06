@@ -1,4 +1,0 @@
-#ifndef VEC_MATH_H
-#define VEC_MATH_H
-double scalar_product(double *x, double *y);
-#endif
