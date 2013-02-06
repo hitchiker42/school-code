@@ -53,7 +53,8 @@ bin_PROGRAMS = test_vector_dot$(EXEEXT) test_vector_add$(EXEEXT)
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure compile depcomp install-sh missing
+	$(top_srcdir)/configure ar-lib compile depcomp install-sh \
+	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -121,6 +122,7 @@ distcleancheck_listfiles = find . -type f -print
 ACLOCAL = ${SHELL} /home/tucker/Documents/my-git/iam751/autotools/linear_algebra/missing --run aclocal-1.11
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
+AR = ar
 AUTOCONF = ${SHELL} /home/tucker/Documents/my-git/iam751/autotools/linear_algebra/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/tucker/Documents/my-git/iam751/autotools/linear_algebra/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/tucker/Documents/my-git/iam751/autotools/linear_algebra/missing --run automake-1.11
@@ -156,6 +158,7 @@ PACKAGE_TARNAME = linear_algebra
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.02
 PATH_SEPARATOR = :
+RANLIB = ranlib
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
@@ -164,6 +167,7 @@ abs_builddir = /home/tucker/Documents/my-git/iam751/autotools/linear_algebra
 abs_srcdir = /home/tucker/Documents/my-git/iam751/autotools/linear_algebra
 abs_top_builddir = /home/tucker/Documents/my-git/iam751/autotools/linear_algebra
 abs_top_srcdir = /home/tucker/Documents/my-git/iam751/autotools/linear_algebra
+ac_ct_AR = ar
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
