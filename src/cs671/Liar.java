@@ -7,18 +7,32 @@ import java.lang.reflect.*;
      Liar Class
    */
 public class Liar<T> implements Guesser<Liar.Secret<T>>{
+  boolean init=false;
+  boolean qmade=false;
+  boolean solved=false;
+  //This is just a macro for myself
+  //So its not documented
   static void println(String arg){
     System.out.println(arg);
   }
   LiarTable liarTable;
   ArrayList<T> candidates;
   int items;
+  /**
+     MaxLies variable
+   */
   public final int maxLies;
+  /**
+     Name variable
+   */
   public final String name;
     /**
      Has Solved Method
    */
   public boolean hasSolved(){
+    if(init != true){
+      throw(new IllegalStateException());
+    }
     return liarTable.hasSolved();
   }
     /**
@@ -34,7 +48,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     /**
      Secret Class
    */
-  static class Secret<E> {
+  public static class Secret<E> {
     int lies;
     E secret;
     Secret(int lies,E secret){
@@ -93,7 +107,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     */
     @SuppressWarnings("unchecked")
     void increment(boolean inTop){
-      println("increment\n");
+      //println("increment\n");
       //might use teritary operator here, but removed for debugging
       TreeMap<Integer,ArrayList<T>> liarList;
       if (inTop==true){
@@ -129,7 +143,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       //move the first n/2+n%2 items from bottom to temp array
       //merge top and bottom, this is new top
       //temp array is new bottom
-      println("swap\n");
+      //println("swap\n");
       //println("before\n"+top.toString()+'\n'+bottom.toString());
       ArrayList<T> up;
       ArrayList<T> down;
@@ -181,9 +195,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
        if not keep going
     */
     boolean hasSolved(){
-      println("hasSolved\n");
+      //println("hasSolved\n");
       int sum=top.get(0).size()+bottom.get(0).size();
-      println(String.format("sum:%d",sum));
+      //println(String.format("sum:%d",sum));
       for (int i=1;i<=maxLies;i++){
         if (sum>1){
           return false;
@@ -193,6 +207,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       if (sum>1){
         return false;
       } else if (sum==1){
+        solved=true;
         return true;
       } else {
         println("What the hell happened");
@@ -228,6 +243,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
      Get Secret Method
    */
   public Secret<T> getSecret(){
+    if (init!=true || solved!=true){
+      throw(new IllegalStateException());
+    }
     Secret<T> ans=null;
     for (int i=0;i<=maxLies;i++){
       if (!liarTable.top.get(i).isEmpty()){
@@ -248,6 +266,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   public String initialize(){
     //reset liarTable
     this.liarTable=new LiarTable(this.candidates,maxLies);
+    init=true;
     return "";
   }
 
@@ -255,6 +274,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
      make Question method
    */
   public String makeQuestion(){
+    if (init!=true || qmade == true){
+      throw(new IllegalStateException());
+    }
     StringBuilder question = new StringBuilder(String.format("Is your %s one of: ",name));
     for (ArrayList<T> i:liarTable.top.values()){
       Iterator<T> q = i.iterator();
@@ -265,13 +287,18 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
     question.deleteCharAt(question.length()-1);//length-1?
     question.append('?');
+    qmade=true;
     return question.toString();
   }
   /**
      no method
    */
   public void no(){
+    if (init!=true || qmade!=true){
+      throw(new IllegalStateException());
+    }
     //add 1 lie to each entry in top and remove any with lies>maxlies
+    qmade=false;
     liarTable.increment(false);
     liarTable.swap();
   }
@@ -280,9 +307,13 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
      yes method
    */
   public void yes(){
+    if (init!=true || qmade!=true){
+      throw(new IllegalStateException());
+    }
     //add 1 lie to each entry in bottom and remove any with lies>maxlies
     liarTable.increment(true);
     liarTable.swap();
+    qmade=false;
   }
   /**
      select Candidates method

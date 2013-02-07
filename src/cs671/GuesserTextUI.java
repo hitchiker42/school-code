@@ -20,12 +20,12 @@ public class GuesserTextUI {
   /**
      GuesserTextUI initalizer
    */
-  GuesserTextUI(Guesser<?> g){
+  public GuesserTextUI(Guesser<?> g){
     this.output=new PrintWriter(new OutputStreamWriter(System.out),true);
     this.input=new BufferedReader(new InputStreamReader(System.in));
     this.guesser=g;
   }
-  GuesserTextUI(Guesser<?> g, Reader input, Writer output){
+  public GuesserTextUI(Guesser<?> g, Reader input, Writer output){
     this.output=new PrintWriter(output);
     this.input=new BufferedReader(input);//may change
     this.guesser=g;
@@ -38,10 +38,41 @@ public class GuesserTextUI {
     int games=0;
     //Main Loop Goes here
     while (play==true){
+      //println("what's going on");
       guesser.initialize();
       while (guesser.hasSolved() != true ){
+        //println("initalized");
         question=guesser.makeQuestion();
-        output.println(question);
+        while(true){
+          output.println(question);
+          try{
+            //answer=new Character((char)input.read()).toString();
+            answer=input.readLine();
+          } catch (IOException ex){
+            println("Input somehow failed");
+            return 3;
+          }
+          if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
+            guesser.yes();
+            break;
+          } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
+            guesser.no();
+            break;
+          }
+          else {
+            //prompt for another answer
+            continue;
+          }
+        }
+        double progress=guesser.progress();
+        //println((String.format("I am %.0f %% complete",100*progress)));
+        output.println(String.format("I am %.0f %% complete",100*progress));
+      }
+      String number=guesser.getSecret().toString(); //need to make generic
+      output.println(String.format("Your number was %s",number));
+      games++;
+      while(true){
+        output.println("Play Again?(y/n)");
         try{
           answer=input.readLine();
         } catch (IOException ex){
@@ -49,31 +80,14 @@ public class GuesserTextUI {
           return 3;
         }
         if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
-          guesser.yes();
+          play=true;
+          break;
         } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
-          guesser.no();
-        }
-        else {
-          //prompt for another answer
+          play=false;
+          break;
+        } else{
           continue;
         }
-        double progress=guesser.progress();
-        output.println(String.format("I am %.0f %% complete",100*progress));
-      }
-      String number=guesser.getSecret().toString(); //need to make generic
-      output.println(String.format("Your number was %s",number));
-      games++;
-      output.println("Play Again?(y/n)");
-      try{
-        answer=input.readLine();
-      } catch (IOException ex){
-        println("Input somehow failed");
-        return 3;
-      }
-      if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
-        play=true;
-      } else if (answer.toLowerCase().equals("n") || answer.toLowerCase().equals("no")){
-        play=false;
       }
     }
     //check API if i have to return games like this do so
