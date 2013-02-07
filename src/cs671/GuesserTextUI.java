@@ -5,9 +5,9 @@ import java.io.*;
 import java.util.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/
 /**
-   GuesserTextUi Class
+   GuesserTextUI Class
  */
-class GuesserTextUI {
+public class GuesserTextUI {
   //I'm lazy and this makes printing things eaiser
   static void println(String arg){
     System.out.println(arg);
@@ -17,6 +17,9 @@ class GuesserTextUI {
   PrintWriter output;
   Guesser<?> guesser;
   String question,answer;
+  /**
+     GuesserTextUI initalizer
+   */
   GuesserTextUI(Guesser<?> g){
     this.output=new PrintWriter(new OutputStreamWriter(System.out),true);
     this.input=new BufferedReader(new InputStreamReader(System.in));
@@ -24,9 +27,12 @@ class GuesserTextUI {
   }
   GuesserTextUI(Guesser<?> g, Reader input, Writer output){
     this.output=new PrintWriter(output);
-    this.input=new BufferedReader(input);
+    this.input=new BufferedReader(input);//may change
     this.guesser=g;
   }
+  /**
+     Play method
+   */
   public int play(){
     boolean play=true;
     int games=0;
@@ -39,6 +45,8 @@ class GuesserTextUI {
         try{
           answer=input.readLine();
         } catch (IOException ex){
+          println("Input somehow failed");
+          return 3;
         }
         if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
           guesser.yes();
@@ -59,6 +67,8 @@ class GuesserTextUI {
       try{
         answer=input.readLine();
       } catch (IOException ex){
+        println("Input somehow failed");
+        return 3;
       }
       if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
         play=true;
@@ -83,6 +93,9 @@ class GuesserTextUI {
     System.out.println(usage);
     return;
   }
+  /**
+     Main method
+   */
   public static void main(String [] args) throws IOException{
     //Test this bit, I need to be surce this is the right way to do this
     if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help")){
@@ -93,20 +106,65 @@ class GuesserTextUI {
         System.out.println("Not Enough Arguements");
         return;
       }
-      try{
-        int lies= new Integer(args[1]);
-        HashSet<String> candidates = new HashSet<>();
-        for (int i=2;i<args.length;i++){
-          candidates.add(args[i]);
+      HashSet<String> candidates = new HashSet<>();
+      /*I can think of no reasonably implimentable means of finding
+        the type of the lies, so they are all going to be strings
+      */
+      String name="String";
+      //using a file
+      if (args[2].equals("-file")){
+        if (args.length != 5){
+          println("If using a file you need 5 arguments of the form:\n"+" -liar #lies -file filename #names");
+          return;
         }
-        //test for some option
-        println(candidates.toString());
-        GuesserTextUI game=new GuesserTextUI(new Liar<>(candidates,lies,"name"));
-        assert(!game.equals(null));
-        game.play();
-      } catch(NumberFormatException ex){
+        try{
+          //println("using A file");
+          int lies= new Integer(args[1]);
+          File file=new File(args[3]);
+          assert(file.exists()==true);
+          //println(file.toString());
+          BufferedReader fileRead=new BufferedReader(new FileReader(file));
+          String word=fileRead.readLine();
+          while (word!=null){
+            candidates.add(word);
+            word=fileRead.readLine();
+          }
+          Liar liar=new Liar<>(candidates,lies,name);
+          try{
+            int n=liar.selectCandidates(new Integer(args[4]));
+            if(n<0){
+              return;
+            }
+          } catch(NumberFormatException ex){
+            println("# of canditates to use not an int");
+            return;
+          }
+          GuesserTextUI game=new GuesserTextUI(liar);
+          game.play();
+        }  catch(FileNotFoundException ex){
+          println("File not found");
+          return;
+        } catch(IOException ex){
+          println("IO exception");
+          return;
+        }
+      } else{
+        //using stdout
+        try{
+          int lies= new Integer(args[1]);
+          for (int i=2;i<args.length;i++){
+            candidates.add(args[i]);
+          }
+          //test for some option
+          println(candidates.toString());
+          GuesserTextUI game=new GuesserTextUI(new Liar<>(candidates,lies,name));
+          assert(!game.equals(null));
+          game.play();
+        } catch(NumberFormatException ex){
+          println("# of lies not an int");
+          return;
+        }
       }
-      return; //temp till I make Liar
     } else if (args[0].equals("-hilo")){
       if(args.length < 2){
         help();
@@ -116,11 +174,12 @@ class GuesserTextUI {
           GuesserTextUI game=new GuesserTextUI(new HiLo(min,max));
           game.play();
         } catch(NumberFormatException ex){
-          System.out.println("Arguments were not ints");
+          println("Arguments were not ints");
+          return;
         }
     }
     else {
-      System.out.println("ERROR");
+      println("ERROR");
       return;
     }
   }
