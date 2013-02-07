@@ -36,6 +36,7 @@ int main(int argv,char** args){
       return 3;
     }
   }
-  printf ("Call with at least one option.\n");
+  printf ("usage:\n-a,vector additon\n-s,dot product\n-m,matrix multiplication\n-h,print this help and exit\n");
+  printf ("call each option with no further parameters to run the tests");
   return 99;
 }
