@@ -19,10 +19,11 @@ tests: cs671 src/tests/*.java
 	$(JAVAC) $(JAVAC_FLAGS) src/tests/*.java
 	@touch tests
 html: $(SOURCES)
-	javadoc @javadoc-options $(SOURCES)
-	@touch html
+	javadoc @javadoc-options $^
+#	@touch html
 clean:
 	/bin/rm -rf cs671 html tests
+doc: html
 # SOURCES1 := src/cs671/Guesser.java \
 #             src/cs671/HiLo.java \
 #             src/cs671/Liar.java \

@@ -3,6 +3,9 @@ import java.util.*;
 import java.util.Collections.*;
 import java.util.EnumSet.*;
 import java.lang.reflect.*;
+  /**
+     Liar Class
+   */
 public class Liar<T> implements Guesser<Liar.Secret<T>>{
   static void println(String arg){
     System.out.println(arg);
@@ -12,9 +15,15 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   int items;
   public final int maxLies;
   public final String name;
+    /**
+     Has Solved Method
+   */
   public boolean hasSolved(){
     return liarTable.hasSolved();
   }
+    /**
+     Progress Method
+   */
   public double progress(){
     return(1-(liarTable.progress()/liarTable.total));
   }
@@ -22,6 +31,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
 
   //Type of Secrets, just used an interface to outside
   //All internal manipulations done w/LiarTable
+    /**
+     Secret Class
+   */
   static class Secret<E> {
     int lies;
     E secret;
@@ -29,12 +41,21 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       this.lies=lies;
       this.secret=secret;
     }
+      /**
+     Get Lies method
+   */
     public int getLies(){
       return lies;
     }
+  /**
+     Get Secret method
+   */
     public E getSecret(){
       return secret;
     }
+  /**
+     to String method
+   */
     public String toString(){
       return String.format("Your object was %s and you told %d lies",secret,lies);//not sure how to format for generics, and should object be name?
     }
@@ -64,7 +85,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         this.bottom.put(i,new ArrayList<T>(items/2+items%2));
       }
       this.total=items*lies;
-      println(this.top.toString()+this.bottom.toString()+'\n');
+      //println(this.top.toString()+this.bottom.toString()+'\n');
     }
 
     /**
@@ -85,8 +106,12 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       //do stuff
       for (int i=maxLies;i>0;i--){
         try{
-        temp=(ArrayList<T>)liarList.get(i-1).clone();
-        liarList.put(i,temp);
+          //warnings suppressed for this,we're casting a clone of
+          //an ArrayList<T> into an ArrayList<T>, so it should
+          //always work, not sure why its necessary but clone
+          //just returns a plain object
+          temp=(ArrayList<T>)liarList.get(i-1).clone();
+          liarList.put(i,temp);
         } catch(ClassCastException ex){
         }
       }
@@ -105,10 +130,11 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       //merge top and bottom, this is new top
       //temp array is new bottom
       println("swap\n");
-      println("before\n"+top.toString()+'\n'+bottom.toString());
+      //println("before\n"+top.toString()+'\n'+bottom.toString());
       ArrayList<T> up;
       ArrayList<T> down;
       ArrayList<T> temp;
+      boolean up_put=false;
       for (int i=0;i<=maxLies;i++){
         up=top.get(i);
         down=bottom.get(i);
@@ -117,7 +143,8 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         if (down.size()==1){
           up.addAll(down);
           down.clear();
-        } else if (up.size()==1 && i!=maxLies){
+        } else if (up.size()==1 && up_put==false){
+          up_put=true;
           continue;
         } else {
           temp.addAll(up.subList(up.size()/2,up.size()));
@@ -130,7 +157,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         top.put(i,up);
         bottom.put(i,temp);
       }
-      println("After\n"+top.toString()+'\n'+bottom.toString());
+      //println("After\n"+top.toString()+'\n'+bottom.toString());
     }
 
     /**
@@ -176,14 +203,20 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   //Constructor
+  /**
+     Liar Constructor
+   */
   public Liar(Set<? extends T> candidates, int lies, String name){
     items=candidates.size();
     try{
       //check if candidates is empty
+      //throw new IllegalArgumentException("empty candidates list");
       //check if lies <0
+      //throw new IllegalArgumentException("Can't Have negitive lies");
       //check if name == null
-      throw new IllegalArgumentException();
-    } catch (IllegalArgumentException ex){
+      //throw new IllegalArgumentException("Unspecified Name");
+      } catch (IllegalArgumentException ex){
+      //println(ex.getMessage());
     }
     this.maxLies=lies;
     this.name=name;
@@ -191,6 +224,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     this.liarTable=new LiarTable(this.candidates,lies);
   }
   //Get Secret
+    /**
+     Get Secret Method
+   */
   public Secret<T> getSecret(){
     Secret<T> ans=null;
     for (int i=0;i<=maxLies;i++){
@@ -206,13 +242,18 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     return(ans);
   }
 
-
+  /**
+     Initialize method
+   */
   public String initialize(){
     //reset liarTable
     this.liarTable=new LiarTable(this.candidates,maxLies);
     return "";
   }
 
+  /**
+     make Question method
+   */
   public String makeQuestion(){
     StringBuilder question = new StringBuilder(String.format("Is your %s one of: ",name));
     for (ArrayList<T> i:liarTable.top.values()){
@@ -226,19 +267,26 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     question.append('?');
     return question.toString();
   }
-
+  /**
+     no method
+   */
   public void no(){
     //add 1 lie to each entry in top and remove any with lies>maxlies
     liarTable.increment(false);
     liarTable.swap();
   }
 
+  /**
+     yes method
+   */
   public void yes(){
     //add 1 lie to each entry in bottom and remove any with lies>maxlies
     liarTable.increment(true);
     liarTable.swap();
   }
-
+  /**
+     select Candidates method
+   */
   public int selectCandidates(int n){
     if (n<=0){
       return -1;
@@ -247,7 +295,8 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
     //Random rand=new Random();
     Collections.shuffle(candidates);
-    candidates=(ArrayList<T>)candidates.subList(0,n);
+    candidates=new ArrayList<T>(candidates.subList(0,n));
+    items=n;
     return n;
   }
 }
