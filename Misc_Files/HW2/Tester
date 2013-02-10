@@ -1,0 +1,1621 @@
+Compiled from "Tester.java"
+final class charpov.grader.Tester$1 implements java.security.PrivilegedAction<java.lang.Void> {
+  final java.util.concurrent.ExecutorService val$exec;
+
+  charpov.grader.Tester$1(java.util.concurrent.ExecutorService);
+    Code:
+       0: aload_0       
+       1: aload_1       
+       2: putfield      #1                  // Field val$exec:Ljava/util/concurrent/ExecutorService;
+       5: aload_0       
+       6: invokespecial #2                  // Method java/lang/Object."<init>":()V
+       9: return        
+
+  public java.lang.Void run();
+    Code:
+       0: aload_0       
+       1: getfield      #1                  // Field val$exec:Ljava/util/concurrent/ExecutorService;
+       4: invokeinterface #3,  1            // InterfaceMethod java/util/concurrent/ExecutorService.shutdown:()V
+       9: aconst_null   
+      10: areturn       
+
+  public java.lang.Object run();
+    Code:
+       0: aload_0       
+       1: invokevirtual #4                  // Method run:()Ljava/lang/Void;
+       4: areturn       
+}
+Compiled from "Tester.java"
+public class charpov.grader.Tester implements java.lang.Runnable, java.util.concurrent.Callable<java.lang.Float> {
+  static final java.util.logging.Logger logger;
+
+  static final java.lang.String SUCCESS;
+
+  static final java.lang.String FAILURE;
+
+  static final java.lang.String WARNING;
+
+  static final java.lang.String ERROR;
+
+  static final java.lang.String INFO;
+
+  static final java.lang.String INDENT;
+
+  private final charpov.grader.Tester$ClassTester[] tests;
+
+  private final java.util.concurrent.BlockingQueue<charpov.grader.Tester$Result> queue;
+
+  private final java.util.Collection<charpov.grader.Tester$Result> results;
+
+  private final java.util.concurrent.ThreadPoolExecutor exec;
+
+  private final java.util.concurrent.ExecutorService testExec;
+
+  private final java.util.concurrent.atomic.AtomicBoolean called;
+
+  private volatile java.io.PrintWriter out;
+
+  private volatile charpov.grader.Tester$Result currentResult;
+
+  static final boolean $assertionsDisabled;
+
+  public charpov.grader.Tester(java.lang.Class<?>...);
+    Code:
+       0: aload_0       
+       1: invokespecial #5                  // Method java/lang/Object."<init>":()V
+       4: aload_0       
+       5: new           #6                  // class java/util/concurrent/LinkedBlockingQueue
+       8: dup           
+       9: invokespecial #7                  // Method java/util/concurrent/LinkedBlockingQueue."<init>":()V
+      12: putfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+      15: aload_0       
+      16: new           #8                  // class java/util/concurrent/ConcurrentLinkedQueue
+      19: dup           
+      20: invokespecial #9                  // Method java/util/concurrent/ConcurrentLinkedQueue."<init>":()V
+      23: putfield      #2                  // Field results:Ljava/util/Collection;
+      26: aload_0       
+      27: iconst_1      
+      28: new           #10                 // class charpov/grader/Factory
+      31: dup           
+      32: ldc           #11                 // String Tester-
+      34: invokespecial #12                 // Method charpov/grader/Factory."<init>":(Ljava/lang/String;)V
+      37: invokestatic  #13                 // Method java/util/concurrent/Executors.newFixedThreadPool:(ILjava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ExecutorService;
+      40: checkcast     #14                 // class java/util/concurrent/ThreadPoolExecutor
+      43: putfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+      46: aload_0       
+      47: new           #16                 // class charpov/grader/DaemonFactory
+      50: dup           
+      51: ldc           #17                 // String Worker-
+      53: invokespecial #18                 // Method charpov/grader/DaemonFactory."<init>":(Ljava/lang/String;)V
+      56: invokestatic  #19                 // Method java/util/concurrent/Executors.newCachedThreadPool:(Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ExecutorService;
+      59: putfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+      62: aload_0       
+      63: new           #20                 // class java/util/concurrent/atomic/AtomicBoolean
+      66: dup           
+      67: iconst_0      
+      68: invokespecial #21                 // Method java/util/concurrent/atomic/AtomicBoolean."<init>":(Z)V
+      71: putfield      #22                 // Field called:Ljava/util/concurrent/atomic/AtomicBoolean;
+      74: aload_0       
+      75: getstatic     #23                 // Field java/lang/System.out:Ljava/io/PrintStream;
+      78: invokevirtual #24                 // Method setOutputStream:(Ljava/io/OutputStream;)V
+      81: aload_1       
+      82: arraylength   
+      83: istore_2      
+      84: aload_0       
+      85: iload_2       
+      86: anewarray     #25                 // class charpov/grader/Tester$ClassTester
+      89: putfield      #26                 // Field tests:[Lcharpov/grader/Tester$ClassTester;
+      92: iconst_0      
+      93: istore_3      
+      94: iload_3       
+      95: iload_2       
+      96: if_icmpge     122
+      99: aload_0       
+     100: getfield      #26                 // Field tests:[Lcharpov/grader/Tester$ClassTester;
+     103: iload_3       
+     104: new           #25                 // class charpov/grader/Tester$ClassTester
+     107: dup           
+     108: aload_0       
+     109: aload_1       
+     110: iload_3       
+     111: aaload        
+     112: invokespecial #27                 // Method charpov/grader/Tester$ClassTester."<init>":(Lcharpov/grader/Tester;Ljava/lang/Class;)V
+     115: aastore       
+     116: iinc          3, 1
+     119: goto          94
+     122: return        
+
+  public java.util.Collection<charpov.grader.Tester$Result> getAllResults();
+    Code:
+       0: aload_0       
+       1: getfield      #2                  // Field results:Ljava/util/Collection;
+       4: areturn       
+
+  public charpov.grader.Tester$Result getNextResult() throws java.lang.InterruptedException;
+    Code:
+       0: aload_0       
+       1: getfield      #28                 // Field currentResult:Lcharpov/grader/Tester$Result;
+       4: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+       7: if_acmpne     12
+      10: aconst_null   
+      11: areturn       
+      12: aload_0       
+      13: aload_0       
+      14: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+      17: invokeinterface #30,  1           // InterfaceMethod java/util/concurrent/BlockingQueue.take:()Ljava/lang/Object;
+      22: checkcast     #31                 // class charpov/grader/Tester$Result
+      25: putfield      #28                 // Field currentResult:Lcharpov/grader/Tester$Result;
+      28: aload_0       
+      29: getfield      #28                 // Field currentResult:Lcharpov/grader/Tester$Result;
+      32: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+      35: if_acmpne     40
+      38: aconst_null   
+      39: areturn       
+      40: aload_0       
+      41: getfield      #28                 // Field currentResult:Lcharpov/grader/Tester$Result;
+      44: areturn       
+
+  public void setOutputStream(java.io.OutputStream);
+    Code:
+       0: aload_1       
+       1: ifnonnull     26
+       4: aload_0       
+       5: new           #32                 // class java/io/PrintWriter
+       8: dup           
+       9: new           #33                 // class charpov/grader/Tester$DevNull
+      12: dup           
+      13: aconst_null   
+      14: invokespecial #34                 // Method charpov/grader/Tester$DevNull."<init>":(Lcharpov/grader/Tester$1;)V
+      17: invokespecial #35                 // Method java/io/PrintWriter."<init>":(Ljava/io/OutputStream;)V
+      20: putfield      #4                  // Field out:Ljava/io/PrintWriter;
+      23: goto          39
+      26: aload_0       
+      27: new           #32                 // class java/io/PrintWriter
+      30: dup           
+      31: aload_1       
+      32: iconst_1      
+      33: invokespecial #36                 // Method java/io/PrintWriter."<init>":(Ljava/io/OutputStream;Z)V
+      36: putfield      #4                  // Field out:Ljava/io/PrintWriter;
+      39: return        
+
+  public synchronized void setConcurrencyLevel(int);
+    Code:
+       0: iload_1       
+       1: iconst_1      
+       2: if_icmpge     15
+       5: new           #37                 // class java/lang/IllegalArgumentException
+       8: dup           
+       9: ldc           #38                 // String concurrency level must be positive
+      11: invokespecial #39                 // Method java/lang/IllegalArgumentException."<init>":(Ljava/lang/String;)V
+      14: athrow        
+      15: aload_0       
+      16: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+      19: iload_1       
+      20: invokevirtual #40                 // Method java/util/concurrent/ThreadPoolExecutor.setCorePoolSize:(I)V
+      23: aload_0       
+      24: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+      27: iload_1       
+      28: invokevirtual #41                 // Method java/util/concurrent/ThreadPoolExecutor.setMaximumPoolSize:(I)V
+      31: return        
+
+  protected void afterClass(java.lang.Object);
+    Code:
+       0: return        
+
+  protected void beforeClass(java.lang.Object);
+    Code:
+       0: return        
+
+  public final void run();
+    Code:
+       0: aload_0       
+       1: invokevirtual #42                 // Method call:()Ljava/lang/Float;
+       4: pop           
+       5: return        
+
+  public java.lang.Float call();
+    Code:
+       0: aload_0       
+       1: getfield      #22                 // Field called:Ljava/util/concurrent/atomic/AtomicBoolean;
+       4: iconst_1      
+       5: invokevirtual #43                 // Method java/util/concurrent/atomic/AtomicBoolean.getAndSet:(Z)Z
+       8: ifeq          21
+      11: new           #44                 // class java/lang/IllegalStateException
+      14: dup           
+      15: ldc           #45                 // String this tester has already been run
+      17: invokespecial #46                 // Method java/lang/IllegalStateException."<init>":(Ljava/lang/String;)V
+      20: athrow        
+      21: dconst_0      
+      22: dstore_1      
+      23: dconst_0      
+      24: dstore_3      
+      25: iconst_0      
+      26: istore        5
+      28: iconst_0      
+      29: istore        6
+      31: aload_0       
+      32: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+      35: aload_0       
+      36: getfield      #26                 // Field tests:[Lcharpov/grader/Tester$ClassTester;
+      39: invokestatic  #47                 // Method java/util/Arrays.asList:([Ljava/lang/Object;)Ljava/util/List;
+      42: invokevirtual #48                 // Method java/util/concurrent/ThreadPoolExecutor.invokeAll:(Ljava/util/Collection;)Ljava/util/List;
+      45: invokeinterface #49,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      50: astore        7
+      52: aload         7
+      54: invokeinterface #50,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      59: ifeq          125
+      62: aload         7
+      64: invokeinterface #51,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      69: checkcast     #52                 // class java/util/concurrent/Future
+      72: astore        8
+      74: aload         8
+      76: invokeinterface #53,  1           // InterfaceMethod java/util/concurrent/Future.get:()Ljava/lang/Object;
+      81: checkcast     #54                 // class charpov/grader/TestResult
+      84: astore        9
+      86: iload         5
+      88: aload         9
+      90: getfield      #55                 // Field charpov/grader/TestResult.passed:I
+      93: iadd          
+      94: istore        5
+      96: iload         6
+      98: aload         9
+     100: getfield      #56                 // Field charpov/grader/TestResult.failed:I
+     103: iadd          
+     104: istore        6
+     106: dload_1       
+     107: aload         9
+     109: getfield      #57                 // Field charpov/grader/TestResult.passedW:D
+     112: dadd          
+     113: dstore_1      
+     114: dload_3       
+     115: aload         9
+     117: getfield      #58                 // Field charpov/grader/TestResult.failedW:D
+     120: dadd          
+     121: dstore_3      
+     122: goto          52
+     125: aload_0       
+     126: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     129: ldc           #59                 // String %s%d test%s passed; %d failed%n
+     131: iconst_4      
+     132: anewarray     #60                 // class java/lang/Object
+     135: dup           
+     136: iconst_0      
+     137: ldc           #61                 // String INFO:    
+     139: aastore       
+     140: dup           
+     141: iconst_1      
+     142: iload         5
+     144: invokestatic  #62                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     147: aastore       
+     148: dup           
+     149: iconst_2      
+     150: iload         5
+     152: iconst_1      
+     153: if_icmple     161
+     156: ldc           #63                 // String s
+     158: goto          163
+     161: ldc           #64                 // String 
+     163: aastore       
+     164: dup           
+     165: iconst_3      
+     166: iload         6
+     168: invokestatic  #62                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     171: aastore       
+     172: invokevirtual #65                 // Method java/io/PrintWriter.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintWriter;
+     175: pop           
+     176: iload         6
+     178: ifne          265
+     181: fconst_1      
+     182: invokestatic  #66                 // Method java/lang/Float.valueOf:(F)Ljava/lang/Float;
+     185: astore        7
+     187: aload_0       
+     188: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     191: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     194: aload_0       
+     195: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     198: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     201: aload_0       
+     202: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     205: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     208: aload_0       
+     209: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     212: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     215: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     220: pop           
+     221: aload_0       
+     222: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     225: ldc2_w        #70                 // long 9223372036854775807l
+     228: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     231: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     234: pop           
+     235: aload_0       
+     236: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     239: ldc2_w        #70                 // long 9223372036854775807l
+     242: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     245: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     250: pop           
+     251: goto          262
+     254: astore        8
+     256: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     259: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     262: aload         7
+     264: areturn       
+     265: iload         5
+     267: ifne          354
+     270: fconst_0      
+     271: invokestatic  #66                 // Method java/lang/Float.valueOf:(F)Ljava/lang/Float;
+     274: astore        7
+     276: aload_0       
+     277: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     280: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     283: aload_0       
+     284: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     287: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     290: aload_0       
+     291: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     294: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     297: aload_0       
+     298: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     301: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     304: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     309: pop           
+     310: aload_0       
+     311: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     314: ldc2_w        #70                 // long 9223372036854775807l
+     317: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     320: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     323: pop           
+     324: aload_0       
+     325: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     328: ldc2_w        #70                 // long 9223372036854775807l
+     331: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     334: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     339: pop           
+     340: goto          351
+     343: astore        8
+     345: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     348: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     351: aload         7
+     353: areturn       
+     354: aload_0       
+     355: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     358: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     361: aload_0       
+     362: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     365: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     368: aload_0       
+     369: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     372: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     375: aload_0       
+     376: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     379: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     382: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     387: pop           
+     388: aload_0       
+     389: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     392: ldc2_w        #70                 // long 9223372036854775807l
+     395: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     398: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     401: pop           
+     402: aload_0       
+     403: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     406: ldc2_w        #70                 // long 9223372036854775807l
+     409: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     412: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     417: pop           
+     418: goto          800
+     421: astore        7
+     423: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     426: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     429: goto          800
+     432: astore        7
+     434: getstatic     #79                 // Field logger:Ljava/util/logging/Logger;
+     437: getstatic     #80                 // Field java/util/logging/Level.SEVERE:Ljava/util/logging/Level;
+     440: ldc           #81                 // String unexpected exception
+     442: aload         7
+     444: invokevirtual #82                 // Method java/util/logging/Logger.log:(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V
+     447: aload_0       
+     448: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     451: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     454: aload_0       
+     455: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     458: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     461: aload_0       
+     462: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     465: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     468: aload_0       
+     469: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     472: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     475: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     480: pop           
+     481: aload_0       
+     482: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     485: ldc2_w        #70                 // long 9223372036854775807l
+     488: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     491: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     494: pop           
+     495: aload_0       
+     496: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     499: ldc2_w        #70                 // long 9223372036854775807l
+     502: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     505: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     510: pop           
+     511: goto          800
+     514: astore        7
+     516: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     519: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     522: goto          800
+     525: astore        7
+     527: getstatic     #79                 // Field logger:Ljava/util/logging/Logger;
+     530: getstatic     #80                 // Field java/util/logging/Level.SEVERE:Ljava/util/logging/Level;
+     533: ldc           #81                 // String unexpected exception
+     535: aload         7
+     537: invokevirtual #84                 // Method java/util/concurrent/ExecutionException.getCause:()Ljava/lang/Throwable;
+     540: invokevirtual #82                 // Method java/util/logging/Logger.log:(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V
+     543: aload_0       
+     544: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     547: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     550: aload_0       
+     551: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     554: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     557: aload_0       
+     558: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     561: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     564: aload_0       
+     565: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     568: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     571: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     576: pop           
+     577: aload_0       
+     578: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     581: ldc2_w        #70                 // long 9223372036854775807l
+     584: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     587: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     590: pop           
+     591: aload_0       
+     592: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     595: ldc2_w        #70                 // long 9223372036854775807l
+     598: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     601: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     606: pop           
+     607: goto          800
+     610: astore        7
+     612: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     615: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     618: goto          800
+     621: astore        7
+     623: getstatic     #79                 // Field logger:Ljava/util/logging/Logger;
+     626: getstatic     #80                 // Field java/util/logging/Level.SEVERE:Ljava/util/logging/Level;
+     629: ldc           #85                 // String unexpected interruption
+     631: aload         7
+     633: invokevirtual #82                 // Method java/util/logging/Logger.log:(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V
+     636: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     639: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     642: aload_0       
+     643: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     646: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     649: aload_0       
+     650: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     653: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     656: aload_0       
+     657: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     660: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     663: aload_0       
+     664: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     667: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     670: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     675: pop           
+     676: aload_0       
+     677: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     680: ldc2_w        #70                 // long 9223372036854775807l
+     683: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     686: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     689: pop           
+     690: aload_0       
+     691: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     694: ldc2_w        #70                 // long 9223372036854775807l
+     697: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     700: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     705: pop           
+     706: goto          800
+     709: astore        7
+     711: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     714: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     717: goto          800
+     720: astore        10
+     722: aload_0       
+     723: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     726: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     729: aload_0       
+     730: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     733: invokestatic  #67                 // Method shutdown:(Ljava/util/concurrent/ExecutorService;)V
+     736: aload_0       
+     737: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+     740: invokevirtual #68                 // Method java/io/PrintWriter.flush:()V
+     743: aload_0       
+     744: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+     747: getstatic     #29                 // Field charpov/grader/Tester$Result.POISON:Lcharpov/grader/Tester$Result;
+     750: invokeinterface #69,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     755: pop           
+     756: aload_0       
+     757: getfield      #15                 // Field exec:Ljava/util/concurrent/ThreadPoolExecutor;
+     760: ldc2_w        #70                 // long 9223372036854775807l
+     763: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     766: invokevirtual #73                 // Method java/util/concurrent/ThreadPoolExecutor.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     769: pop           
+     770: aload_0       
+     771: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+     774: ldc2_w        #70                 // long 9223372036854775807l
+     777: getstatic     #72                 // Field java/util/concurrent/TimeUnit.DAYS:Ljava/util/concurrent/TimeUnit;
+     780: invokeinterface #74,  4           // InterfaceMethod java/util/concurrent/ExecutorService.awaitTermination:(JLjava/util/concurrent/TimeUnit;)Z
+     785: pop           
+     786: goto          797
+     789: astore        11
+     791: invokestatic  #76                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     794: invokevirtual #77                 // Method java/lang/Thread.interrupt:()V
+     797: aload         10
+     799: athrow        
+     800: dload_1       
+     801: dload_1       
+     802: dload_3       
+     803: dadd          
+     804: ddiv          
+     805: d2f           
+     806: invokestatic  #66                 // Method java/lang/Float.valueOf:(F)Ljava/lang/Float;
+     809: areturn       
+    Exception table:
+       from    to  target type
+         221   251   254   Class java/lang/InterruptedException
+         310   340   343   Class java/lang/InterruptedException
+         388   418   421   Class java/lang/InterruptedException
+          31   187   432   Class java/util/concurrent/RejectedExecutionException
+         265   276   432   Class java/util/concurrent/RejectedExecutionException
+         481   511   514   Class java/lang/InterruptedException
+          31   187   525   Class java/util/concurrent/ExecutionException
+         265   276   525   Class java/util/concurrent/ExecutionException
+         577   607   610   Class java/lang/InterruptedException
+          31   187   621   Class java/lang/InterruptedException
+         265   276   621   Class java/lang/InterruptedException
+         676   706   709   Class java/lang/InterruptedException
+          31   187   720   any
+         265   276   720   any
+         432   447   720   any
+         525   543   720   any
+         621   642   720   any
+         756   786   789   Class java/lang/InterruptedException
+         720   722   720   any
+
+  static void shutdown(java.util.concurrent.ExecutorService);
+    Code:
+       0: new           #86                 // class charpov/grader/Tester$1
+       3: dup           
+       4: aload_0       
+       5: invokespecial #87                 // Method charpov/grader/Tester$1."<init>":(Ljava/util/concurrent/ExecutorService;)V
+       8: invokestatic  #88                 // Method java/security/AccessController.doPrivileged:(Ljava/security/PrivilegedAction;)Ljava/lang/Object;
+      11: pop           
+      12: return        
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: invokestatic  #89                 // Method java/lang/ClassLoader.getSystemClassLoader:()Ljava/lang/ClassLoader;
+       3: astore_1      
+       4: new           #90                 // class java/util/ArrayList
+       7: dup           
+       8: invokespecial #91                 // Method java/util/ArrayList."<init>":()V
+      11: astore_2      
+      12: bipush        100
+      14: istore_3      
+      15: iconst_1      
+      16: istore        4
+      18: ldc           #92                 // String testResults.txt
+      20: astore        5
+      22: iconst_0      
+      23: istore        6
+      25: iload         6
+      27: aload_0       
+      28: arraylength   
+      29: if_icmpge     372
+      32: aload_0       
+      33: iload         6
+      35: aaload        
+      36: astore        7
+      38: aload         7
+      40: ldc           #93                 // String -
+      42: invokevirtual #94                 // Method java/lang/String.startsWith:(Ljava/lang/String;)Z
+      45: ifeq          328
+      48: aload         7
+      50: ldc           #95                 // String -resultsFile
+      52: invokevirtual #96                 // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      55: ifeq          86
+      58: iinc          6, 1
+      61: iload         6
+      63: aload_0       
+      64: arraylength   
+      65: if_icmpne     77
+      68: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+      71: ldc           #98                 // String -resultsFile requires a parameter
+      73: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+      76: return        
+      77: aload_0       
+      78: iload         6
+      80: aaload        
+      81: astore        5
+      83: goto          366
+      86: aload         7
+      88: ldc           #100                // String -total
+      90: invokevirtual #96                 // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+      93: ifeq          190
+      96: iinc          6, 1
+      99: iload         6
+     101: aload_0       
+     102: arraylength   
+     103: if_icmpne     115
+     106: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     109: ldc           #101                // String -total requires a parameter
+     111: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     114: return        
+     115: aload_0       
+     116: iload         6
+     118: aaload        
+     119: invokestatic  #102                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+     122: istore_3      
+     123: goto          157
+     126: astore        8
+     128: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     131: new           #104                // class java/lang/StringBuilder
+     134: dup           
+     135: invokespecial #105                // Method java/lang/StringBuilder."<init>":()V
+     138: ldc           #106                // String invalid integer value: 
+     140: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     143: aload_0       
+     144: iload         6
+     146: aaload        
+     147: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     150: invokevirtual #108                // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     153: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     156: return        
+     157: iload_3       
+     158: ifgt          366
+     161: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     164: new           #104                // class java/lang/StringBuilder
+     167: dup           
+     168: invokespecial #105                // Method java/lang/StringBuilder."<init>":()V
+     171: ldc           #109                // String Value must be greater than 0: 
+     173: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     176: aload_0       
+     177: iload         6
+     179: aaload        
+     180: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     183: invokevirtual #108                // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     186: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     189: return        
+     190: aload         7
+     192: ldc           #110                // String -concur
+     194: invokevirtual #96                 // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+     197: ifeq          309
+     200: iinc          6, 1
+     203: iload         6
+     205: aload_0       
+     206: arraylength   
+     207: if_icmpne     219
+     210: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     213: ldc           #111                // String -concur requires a parameter
+     215: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     218: return        
+     219: aload_0       
+     220: iload         6
+     222: aaload        
+     223: invokestatic  #102                // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+     226: istore        4
+     228: goto          262
+     231: astore        8
+     233: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     236: new           #104                // class java/lang/StringBuilder
+     239: dup           
+     240: invokespecial #105                // Method java/lang/StringBuilder."<init>":()V
+     243: ldc           #106                // String invalid integer value: 
+     245: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     248: aload_0       
+     249: iload         6
+     251: aaload        
+     252: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     255: invokevirtual #108                // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     258: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     261: return        
+     262: iload         4
+     264: ifge          296
+     267: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     270: new           #104                // class java/lang/StringBuilder
+     273: dup           
+     274: invokespecial #105                // Method java/lang/StringBuilder."<init>":()V
+     277: ldc           #112                // String Value must not be negative: 
+     279: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     282: aload_0       
+     283: iload         6
+     285: aaload        
+     286: invokevirtual #107                // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     289: invokevirtual #108                // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     292: invokevirtual #99                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     295: return        
+     296: iload         4
+     298: ifne          309
+     301: invokestatic  #113                // Method java/lang/Runtime.getRuntime:()Ljava/lang/Runtime;
+     304: invokevirtual #114                // Method java/lang/Runtime.availableProcessors:()I
+     307: istore        4
+     309: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     312: ldc           #115                // String unknown switch: %s; aborting%n
+     314: iconst_1      
+     315: anewarray     #60                 // class java/lang/Object
+     318: dup           
+     319: iconst_0      
+     320: aload         7
+     322: aastore       
+     323: invokevirtual #116                // Method java/io/PrintStream.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
+     326: pop           
+     327: return        
+     328: aload_2       
+     329: aload         7
+     331: iconst_1      
+     332: aload_1       
+     333: invokestatic  #117                // Method java/lang/Class.forName:(Ljava/lang/String;ZLjava/lang/ClassLoader;)Ljava/lang/Class;
+     336: invokeinterface #118,  2          // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+     341: pop           
+     342: goto          366
+     345: astore        8
+     347: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     350: ldc           #120                // String class '%s' not found; aborting%n
+     352: iconst_1      
+     353: anewarray     #60                 // class java/lang/Object
+     356: dup           
+     357: iconst_0      
+     358: aload         7
+     360: aastore       
+     361: invokevirtual #116                // Method java/io/PrintStream.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
+     364: pop           
+     365: return        
+     366: iinc          6, 1
+     369: goto          25
+     372: new           #121                // class java/io/FileOutputStream
+     375: dup           
+     376: aload         5
+     378: invokespecial #122                // Method java/io/FileOutputStream."<init>":(Ljava/lang/String;)V
+     381: astore        6
+     383: new           #123                // class charpov/grader/Tester
+     386: dup           
+     387: aload_2       
+     388: aload_2       
+     389: invokeinterface #124,  1          // InterfaceMethod java/util/List.size:()I
+     394: anewarray     #125                // class java/lang/Class
+     397: invokeinterface #126,  2          // InterfaceMethod java/util/List.toArray:([Ljava/lang/Object;)[Ljava/lang/Object;
+     402: checkcast     #127                // class "[Ljava/lang/Class;"
+     405: invokespecial #128                // Method "<init>":([Ljava/lang/Class;)V
+     408: astore        7
+     410: aload         7
+     412: iload         4
+     414: invokevirtual #129                // Method setConcurrencyLevel:(I)V
+     417: aload         7
+     419: aload         6
+     421: invokevirtual #24                 // Method setOutputStream:(Ljava/io/OutputStream;)V
+     424: aload         7
+     426: invokevirtual #42                 // Method call:()Ljava/lang/Float;
+     429: invokevirtual #130                // Method java/lang/Float.floatValue:()F
+     432: fstore        8
+     434: aload         6
+     436: invokevirtual #131                // Method java/io/OutputStream.flush:()V
+     439: new           #32                 // class java/io/PrintWriter
+     442: dup           
+     443: aload         6
+     445: invokespecial #35                 // Method java/io/PrintWriter."<init>":(Ljava/io/OutputStream;)V
+     448: astore        9
+     450: aload         9
+     452: ldc           #132                // String Grade: %.0f / %d%n
+     454: iconst_2      
+     455: anewarray     #60                 // class java/lang/Object
+     458: dup           
+     459: iconst_0      
+     460: fload         8
+     462: iload_3       
+     463: i2f           
+     464: fmul          
+     465: invokestatic  #66                 // Method java/lang/Float.valueOf:(F)Ljava/lang/Float;
+     468: aastore       
+     469: dup           
+     470: iconst_1      
+     471: iload_3       
+     472: invokestatic  #62                 // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     475: aastore       
+     476: invokevirtual #65                 // Method java/io/PrintWriter.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintWriter;
+     479: pop           
+     480: aload         9
+     482: invokevirtual #133                // Method java/io/PrintWriter.close:()V
+     485: iconst_0      
+     486: invokestatic  #134                // Method java/lang/System.exit:(I)V
+     489: goto          515
+     492: astore        6
+     494: getstatic     #97                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     497: ldc           #136                // String cannot write test results: %s%n
+     499: iconst_1      
+     500: anewarray     #60                 // class java/lang/Object
+     503: dup           
+     504: iconst_0      
+     505: aload         6
+     507: invokevirtual #137                // Method java/io/IOException.getMessage:()Ljava/lang/String;
+     510: aastore       
+     511: invokevirtual #116                // Method java/io/PrintStream.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
+     514: pop           
+     515: return        
+    Exception table:
+       from    to  target type
+         115   123   126   Class java/lang/NumberFormatException
+         219   228   231   Class java/lang/NumberFormatException
+         328   342   345   Class java/lang/ClassNotFoundException
+         372   489   492   Class java/io/IOException
+
+  public java.lang.Object call() throws java.lang.Exception;
+    Code:
+       0: aload_0       
+       1: invokevirtual #42                 // Method call:()Ljava/lang/Float;
+       4: areturn       
+
+  static java.io.PrintWriter access$100(charpov.grader.Tester);
+    Code:
+       0: aload_0       
+       1: getfield      #4                  // Field out:Ljava/io/PrintWriter;
+       4: areturn       
+
+  static java.util.concurrent.ExecutorService access$200(charpov.grader.Tester);
+    Code:
+       0: aload_0       
+       1: getfield      #3                  // Field testExec:Ljava/util/concurrent/ExecutorService;
+       4: areturn       
+
+  static java.util.Collection access$400(charpov.grader.Tester);
+    Code:
+       0: aload_0       
+       1: getfield      #2                  // Field results:Ljava/util/Collection;
+       4: areturn       
+
+  static java.util.concurrent.BlockingQueue access$500(charpov.grader.Tester);
+    Code:
+       0: aload_0       
+       1: getfield      #1                  // Field queue:Ljava/util/concurrent/BlockingQueue;
+       4: areturn       
+
+  static {};
+    Code:
+       0: ldc_w         #123                // class charpov/grader/Tester
+       3: invokevirtual #138                // Method java/lang/Class.desiredAssertionStatus:()Z
+       6: ifne          13
+       9: iconst_1      
+      10: goto          14
+      13: iconst_0      
+      14: putstatic     #139                // Field $assertionsDisabled:Z
+      17: ldc           #140                // String charpov.grader
+      19: invokestatic  #141                // Method java/util/logging/Logger.getLogger:(Ljava/lang/String;)Ljava/util/logging/Logger;
+      22: putstatic     #79                 // Field logger:Ljava/util/logging/Logger;
+      25: ldc           #142                // String          
+      27: invokevirtual #143                // Method java/lang/String.length:()I
+      30: istore_0      
+      31: getstatic     #139                // Field $assertionsDisabled:Z
+      34: ifne          90
+      37: ldc           #144                // String SUCCESS: 
+      39: invokevirtual #143                // Method java/lang/String.length:()I
+      42: iload_0       
+      43: if_icmpne     82
+      46: ldc           #145                // String FAILURE: 
+      48: invokevirtual #143                // Method java/lang/String.length:()I
+      51: iload_0       
+      52: if_icmpne     82
+      55: ldc           #146                // String WARNING: 
+      57: invokevirtual #143                // Method java/lang/String.length:()I
+      60: iload_0       
+      61: if_icmpne     82
+      64: ldc           #147                // String ERROR:   
+      66: invokevirtual #143                // Method java/lang/String.length:()I
+      69: iload_0       
+      70: if_icmpne     82
+      73: ldc           #61                 // String INFO:    
+      75: invokevirtual #143                // Method java/lang/String.length:()I
+      78: iload_0       
+      79: if_icmpeq     90
+      82: new           #148                // class java/lang/AssertionError
+      85: dup           
+      86: invokespecial #149                // Method java/lang/AssertionError."<init>":()V
+      89: athrow        
+      90: return        
+}
+Compiled from "Tester.java"
+class charpov.grader.Tester$ClassTester implements java.util.concurrent.Callable<charpov.grader.TestResult> {
+  private final java.lang.Class<?> clazz;
+
+  private final java.lang.reflect.Constructor<?> cons;
+
+  private final charpov.grader.TestMethod[] methods;
+
+  private final java.lang.Object instance;
+
+  private final double total;
+
+  static final boolean $assertionsDisabled;
+
+  final charpov.grader.Tester this$0;
+
+  public charpov.grader.Tester$ClassTester(java.lang.Class<?>);
+    Code:
+       0: aload_0       
+       1: aload_1       
+       2: putfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+       5: aload_0       
+       6: invokespecial #2                  // Method java/lang/Object."<init>":()V
+       9: aload_2       
+      10: ldc_w         #3                  // class charpov/grader/Test
+      13: invokevirtual #4                  // Method java/lang/Class.getAnnotation:(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+      16: checkcast     #3                  // class charpov/grader/Test
+      19: astore_3      
+      20: aload_3       
+      21: ifnonnull     34
+      24: aload_0       
+      25: ldc2_w        #5                  // double -1.0d
+      28: putfield      #7                  // Field total:D
+      31: goto          44
+      34: aload_0       
+      35: aload_3       
+      36: invokeinterface #8,  1            // InterfaceMethod charpov/grader/Test.val:()D
+      41: putfield      #7                  // Field total:D
+      44: aload_0       
+      45: aload_2       
+      46: putfield      #9                  // Field clazz:Ljava/lang/Class;
+      49: aload_0       
+      50: aload_0       
+      51: invokespecial #10                 // Method getConstructor:()Ljava/lang/reflect/Constructor;
+      54: putfield      #11                 // Field cons:Ljava/lang/reflect/Constructor;
+      57: aload_0       
+      58: aload_0       
+      59: getfield      #11                 // Field cons:Ljava/lang/reflect/Constructor;
+      62: ifnonnull     69
+      65: aconst_null   
+      66: goto          73
+      69: aload_0       
+      70: invokespecial #12                 // Method makeInstance:()Ljava/lang/Object;
+      73: putfield      #13                 // Field instance:Ljava/lang/Object;
+      76: aload_0       
+      77: aload_0       
+      78: getfield      #13                 // Field instance:Ljava/lang/Object;
+      81: ifnonnull     88
+      84: aconst_null   
+      85: goto          92
+      88: aload_0       
+      89: invokespecial #14                 // Method getMethods:()[Lcharpov/grader/TestMethod;
+      92: putfield      #15                 // Field methods:[Lcharpov/grader/TestMethod;
+      95: return        
+
+  public charpov.grader.TestResult call();
+    Code:
+       0: aconst_null   
+       1: astore_1      
+       2: aload_0       
+       3: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+       6: aload_0       
+       7: getfield      #13                 // Field instance:Ljava/lang/Object;
+      10: invokevirtual #16                 // Method charpov/grader/Tester.beforeClass:(Ljava/lang/Object;)V
+      13: goto          26
+      16: astore_2      
+      17: new           #18                 // class charpov/grader/TestException
+      20: dup           
+      21: aload_2       
+      22: invokespecial #19                 // Method charpov/grader/TestException."<init>":(Ljava/lang/Throwable;)V
+      25: astore_1      
+      26: aload_1       
+      27: ifnull        59
+      30: aload_0       
+      31: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+      34: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+      37: aload_1       
+      38: ldc           #21                 // String beforeClass hook
+      40: ldc           #21                 // String beforeClass hook
+      42: aload_0       
+      43: getfield      #9                  // Field clazz:Ljava/lang/Class;
+      46: invokevirtual #22                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      49: invokestatic  #23                 // Method charpov/grader/ExInfo.failure:(Lcharpov/grader/TestException;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+      52: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+      55: getstatic     #25                 // Field charpov/grader/TestResult.NONE:Lcharpov/grader/TestResult;
+      58: areturn       
+      59: aload_0       
+      60: getfield      #13                 // Field instance:Ljava/lang/Object;
+      63: ifnonnull     70
+      66: getstatic     #25                 // Field charpov/grader/TestResult.NONE:Lcharpov/grader/TestResult;
+      69: areturn       
+      70: aload_0       
+      71: getfield      #9                  // Field clazz:Ljava/lang/Class;
+      74: invokevirtual #22                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      77: astore_2      
+      78: dconst_0      
+      79: dstore_3      
+      80: dconst_0      
+      81: dstore        5
+      83: iconst_0      
+      84: istore        7
+      86: iconst_0      
+      87: istore        8
+      89: aload_0       
+      90: getfield      #15                 // Field methods:[Lcharpov/grader/TestMethod;
+      93: astore        9
+      95: aload         9
+      97: arraylength   
+      98: istore        10
+     100: iconst_0      
+     101: istore        11
+     103: iload         11
+     105: iload         10
+     107: if_icmpge     418
+     110: aload         9
+     112: iload         11
+     114: aaload        
+     115: astore        12
+     117: aload         12
+     119: invokevirtual #26                 // Method charpov/grader/TestMethod.getWeight:()D
+     122: dstore        13
+     124: aload_0       
+     125: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     128: invokestatic  #27                 // Method charpov/grader/Tester.access$200:(Lcharpov/grader/Tester;)Ljava/util/concurrent/ExecutorService;
+     131: aload         12
+     133: invokeinterface #28,  2           // InterfaceMethod java/util/concurrent/ExecutorService.submit:(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Future;
+     138: invokeinterface #29,  1           // InterfaceMethod java/util/concurrent/Future.get:()Ljava/lang/Object;
+     143: checkcast     #18                 // class charpov/grader/TestException
+     146: astore_1      
+     147: aload_1       
+     148: ifnonnull     207
+     151: dload_3       
+     152: dload         13
+     154: dadd          
+     155: dstore_3      
+     156: iinc          7, 1
+     159: aload_0       
+     160: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     163: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+     166: new           #30                 // class java/lang/StringBuilder
+     169: dup           
+     170: invokespecial #31                 // Method java/lang/StringBuilder."<init>":()V
+     173: aload_2       
+     174: invokevirtual #32                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     177: ldc           #33                 // String .
+     179: invokevirtual #32                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     182: aload         12
+     184: invokevirtual #34                 // Method charpov/grader/TestMethod.getName:()Ljava/lang/String;
+     187: invokevirtual #32                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     190: invokevirtual #35                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     193: aload         12
+     195: getfield      #36                 // Field charpov/grader/TestMethod.duration:J
+     198: invokestatic  #37                 // Method charpov/grader/ExInfo.success:(Ljava/lang/String;J)Ljava/lang/String;
+     201: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+     204: goto          341
+     207: aload_1       
+     208: invokevirtual #38                 // Method charpov/grader/TestException.getCause:()Ljava/lang/Throwable;
+     211: instanceof    #39                 // class charpov/grader/IgnoreThisTest
+     214: ifeq          306
+     217: aload_1       
+     218: invokevirtual #38                 // Method charpov/grader/TestException.getCause:()Ljava/lang/Throwable;
+     221: invokevirtual #40                 // Method java/lang/Throwable.getMessage:()Ljava/lang/String;
+     224: astore        15
+     226: aload         15
+     228: ifnull        239
+     231: aload         15
+     233: invokevirtual #41                 // Method java/lang/String.isEmpty:()Z
+     236: ifeq          246
+     239: ldc           #33                 // String .
+     241: astore        15
+     243: goto          268
+     246: new           #30                 // class java/lang/StringBuilder
+     249: dup           
+     250: invokespecial #31                 // Method java/lang/StringBuilder."<init>":()V
+     253: ldc           #42                 // String : 
+     255: invokevirtual #32                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     258: aload         15
+     260: invokevirtual #32                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     263: invokevirtual #35                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     266: astore        15
+     268: aload_0       
+     269: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     272: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+     275: ldc           #43                 // String %s%s ignored%s%n
+     277: iconst_3      
+     278: anewarray     #44                 // class java/lang/Object
+     281: dup           
+     282: iconst_0      
+     283: ldc           #45                 // String INFO:    
+     285: aastore       
+     286: dup           
+     287: iconst_1      
+     288: aload         12
+     290: invokevirtual #34                 // Method charpov/grader/TestMethod.getName:()Ljava/lang/String;
+     293: aastore       
+     294: dup           
+     295: iconst_2      
+     296: aload         15
+     298: aastore       
+     299: invokevirtual #46                 // Method java/io/PrintWriter.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintWriter;
+     302: pop           
+     303: goto          412
+     306: dload         5
+     308: dload         13
+     310: dadd          
+     311: dstore        5
+     313: iinc          8, 1
+     316: aload_0       
+     317: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     320: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+     323: aload_1       
+     324: aload         12
+     326: invokevirtual #47                 // Method charpov/grader/TestMethod.getRealName:()Ljava/lang/String;
+     329: aload         12
+     331: invokevirtual #34                 // Method charpov/grader/TestMethod.getName:()Ljava/lang/String;
+     334: aload_2       
+     335: invokestatic  #23                 // Method charpov/grader/ExInfo.failure:(Lcharpov/grader/TestException;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+     338: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+     341: new           #48                 // class charpov/grader/Tester$Result
+     344: dup           
+     345: aload         12
+     347: invokevirtual #34                 // Method charpov/grader/TestMethod.getName:()Ljava/lang/String;
+     350: aload_0       
+     351: getfield      #13                 // Field instance:Ljava/lang/Object;
+     354: aload         12
+     356: getfield      #49                 // Field charpov/grader/TestMethod.returnedValue:Ljava/lang/Object;
+     359: aload_1       
+     360: ifnonnull     367
+     363: aconst_null   
+     364: goto          371
+     367: aload_1       
+     368: invokevirtual #38                 // Method charpov/grader/TestException.getCause:()Ljava/lang/Throwable;
+     371: aload         12
+     373: getfield      #36                 // Field charpov/grader/TestMethod.duration:J
+     376: aconst_null   
+     377: invokespecial #50                 // Method charpov/grader/Tester$Result."<init>":(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;JLcharpov/grader/Tester$1;)V
+     380: astore        15
+     382: aload_0       
+     383: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     386: invokestatic  #51                 // Method charpov/grader/Tester.access$400:(Lcharpov/grader/Tester;)Ljava/util/Collection;
+     389: aload         15
+     391: invokeinterface #52,  2           // InterfaceMethod java/util/Collection.add:(Ljava/lang/Object;)Z
+     396: pop           
+     397: aload_0       
+     398: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     401: invokestatic  #53                 // Method charpov/grader/Tester.access$500:(Lcharpov/grader/Tester;)Ljava/util/concurrent/BlockingQueue;
+     404: aload         15
+     406: invokeinterface #54,  2           // InterfaceMethod java/util/concurrent/BlockingQueue.add:(Ljava/lang/Object;)Z
+     411: pop           
+     412: iinc          11, 1
+     415: goto          103
+     418: goto          455
+     421: astore        9
+     423: invokestatic  #56                 // Method java/lang/Thread.currentThread:()Ljava/lang/Thread;
+     426: invokevirtual #57                 // Method java/lang/Thread.interrupt:()V
+     429: goto          455
+     432: astore        9
+     434: goto          455
+     437: astore        9
+     439: getstatic     #60                 // Field charpov/grader/Tester.logger:Ljava/util/logging/Logger;
+     442: getstatic     #61                 // Field java/util/logging/Level.SEVERE:Ljava/util/logging/Level;
+     445: ldc           #62                 // String unexpected exception
+     447: aload         9
+     449: invokevirtual #63                 // Method java/util/concurrent/ExecutionException.getCause:()Ljava/lang/Throwable;
+     452: invokevirtual #64                 // Method java/util/logging/Logger.log:(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V
+     455: aconst_null   
+     456: astore_1      
+     457: aload_0       
+     458: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     461: aload_0       
+     462: getfield      #13                 // Field instance:Ljava/lang/Object;
+     465: invokevirtual #65                 // Method charpov/grader/Tester.afterClass:(Ljava/lang/Object;)V
+     468: goto          483
+     471: astore        9
+     473: new           #18                 // class charpov/grader/TestException
+     476: dup           
+     477: aload         9
+     479: invokespecial #19                 // Method charpov/grader/TestException."<init>":(Ljava/lang/Throwable;)V
+     482: astore_1      
+     483: aload_1       
+     484: ifnull        512
+     487: aload_0       
+     488: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     491: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+     494: aload_1       
+     495: ldc           #66                 // String afterClass hook
+     497: ldc           #66                 // String afterClass hook
+     499: aload_0       
+     500: getfield      #9                  // Field clazz:Ljava/lang/Class;
+     503: invokevirtual #22                 // Method java/lang/Class.getName:()Ljava/lang/String;
+     506: invokestatic  #23                 // Method charpov/grader/ExInfo.failure:(Lcharpov/grader/TestException;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+     509: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+     512: aload_0       
+     513: getfield      #7                  // Field total:D
+     516: ldc2_w        #5                  // double -1.0d
+     519: dcmpl         
+     520: ifeq          550
+     523: dload_3       
+     524: dload         5
+     526: dadd          
+     527: dstore        9
+     529: aload_0       
+     530: getfield      #7                  // Field total:D
+     533: dload         9
+     535: ddiv          
+     536: dstore        11
+     538: dload         11
+     540: dload_3       
+     541: dmul          
+     542: dstore_3      
+     543: dload         11
+     545: dload         5
+     547: dmul          
+     548: dstore        5
+     550: new           #67                 // class charpov/grader/TestResult
+     553: dup           
+     554: iload         7
+     556: iload         8
+     558: dload_3       
+     559: dload         5
+     561: invokespecial #68                 // Method charpov/grader/TestResult."<init>":(IIDD)V
+     564: areturn       
+    Exception table:
+       from    to  target type
+           2    13    16   Class java/lang/Throwable
+          89   418   421   Class java/lang/InterruptedException
+          89   418   432   Class java/util/concurrent/RejectedExecutionException
+          89   418   437   Class java/util/concurrent/ExecutionException
+         457   468   471   Class java/lang/Throwable
+
+  private java.lang.reflect.Constructor<?> getConstructor();
+    Code:
+       0: new           #69                 // class charpov/grader/GetConstructor
+       3: dup           
+       4: aload_0       
+       5: getfield      #9                  // Field clazz:Ljava/lang/Class;
+       8: invokespecial #70                 // Method charpov/grader/GetConstructor."<init>":(Ljava/lang/Class;)V
+      11: invokestatic  #71                 // Method java/security/AccessController.doPrivileged:(Ljava/security/PrivilegedExceptionAction;)Ljava/lang/Object;
+      14: checkcast     #72                 // class java/lang/reflect/Constructor
+      17: areturn       
+      18: astore_1      
+      19: aload_1       
+      20: invokevirtual #74                 // Method java/security/PrivilegedActionException.getCause:()Ljava/lang/Throwable;
+      23: astore_2      
+      24: getstatic     #75                 // Field $assertionsDisabled:Z
+      27: ifne          45
+      30: aload_2       
+      31: instanceof    #76                 // class java/lang/NoSuchMethodException
+      34: ifne          45
+      37: new           #77                 // class java/lang/AssertionError
+      40: dup           
+      41: invokespecial #78                 // Method java/lang/AssertionError."<init>":()V
+      44: athrow        
+      45: aload_0       
+      46: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+      49: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+      52: ldc           #79                 // String %sclass '%s' does not have a NO-ARGUMENT constructor
+      54: iconst_2      
+      55: anewarray     #44                 // class java/lang/Object
+      58: dup           
+      59: iconst_0      
+      60: ldc           #80                 // String ERROR:   
+      62: aastore       
+      63: dup           
+      64: iconst_1      
+      65: aload_0       
+      66: getfield      #9                  // Field clazz:Ljava/lang/Class;
+      69: invokevirtual #22                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      72: aastore       
+      73: invokevirtual #46                 // Method java/io/PrintWriter.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintWriter;
+      76: pop           
+      77: aconst_null   
+      78: areturn       
+    Exception table:
+       from    to  target type
+           0    17    18   Class java/security/PrivilegedActionException
+
+  private java.lang.Object makeInstance();
+    Code:
+       0: getstatic     #75                 // Field $assertionsDisabled:Z
+       3: ifne          21
+       6: aload_0       
+       7: getfield      #13                 // Field instance:Ljava/lang/Object;
+      10: ifnull        21
+      13: new           #77                 // class java/lang/AssertionError
+      16: dup           
+      17: invokespecial #78                 // Method java/lang/AssertionError."<init>":()V
+      20: athrow        
+      21: aconst_null   
+      22: astore_1      
+      23: aload_0       
+      24: getfield      #11                 // Field cons:Ljava/lang/reflect/Constructor;
+      27: iconst_0      
+      28: anewarray     #44                 // class java/lang/Object
+      31: invokevirtual #81                 // Method java/lang/reflect/Constructor.newInstance:([Ljava/lang/Object;)Ljava/lang/Object;
+      34: astore_1      
+      35: goto          152
+      38: astore_2      
+      39: new           #77                 // class java/lang/AssertionError
+      42: dup           
+      43: ldc           #83                 // String unexpected IllegalAccessException
+      45: invokespecial #84                 // Method java/lang/AssertionError."<init>":(Ljava/lang/Object;)V
+      48: athrow        
+      49: astore_2      
+      50: aload_2       
+      51: invokevirtual #86                 // Method java/lang/reflect/InvocationTargetException.getCause:()Ljava/lang/Throwable;
+      54: astore_3      
+      55: aload_3       
+      56: ifnonnull     61
+      59: aload_2       
+      60: astore_3      
+      61: aload_0       
+      62: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+      65: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+      68: aload_0       
+      69: getfield      #9                  // Field clazz:Ljava/lang/Class;
+      72: aload_3       
+      73: ldc           #87                 // String <init>
+      75: invokestatic  #88                 // Method charpov/grader/ExInfo.error:(Ljava/lang/Class;Ljava/lang/Throwable;Ljava/lang/String;)Ljava/lang/String;
+      78: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+      81: goto          152
+      84: astore_2      
+      85: aload_0       
+      86: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+      89: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+      92: ldc           #90                 // String %sclass '%s' cannot be abstract%n
+      94: iconst_2      
+      95: anewarray     #44                 // class java/lang/Object
+      98: dup           
+      99: iconst_0      
+     100: ldc           #80                 // String ERROR:   
+     102: aastore       
+     103: dup           
+     104: iconst_1      
+     105: aload_0       
+     106: getfield      #9                  // Field clazz:Ljava/lang/Class;
+     109: invokevirtual #22                 // Method java/lang/Class.getName:()Ljava/lang/String;
+     112: aastore       
+     113: invokevirtual #46                 // Method java/io/PrintWriter.printf:(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintWriter;
+     116: pop           
+     117: goto          152
+     120: astore_2      
+     121: aload_2       
+     122: invokevirtual #92                 // Method java/lang/ExceptionInInitializerError.getCause:()Ljava/lang/Throwable;
+     125: astore_3      
+     126: aload_3       
+     127: ifnonnull     132
+     130: aload_2       
+     131: astore_3      
+     132: aload_0       
+     133: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+     136: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+     139: aload_0       
+     140: getfield      #9                  // Field clazz:Ljava/lang/Class;
+     143: aload_3       
+     144: ldc           #93                 // String <clinit>
+     146: invokestatic  #88                 // Method charpov/grader/ExInfo.error:(Ljava/lang/Class;Ljava/lang/Throwable;Ljava/lang/String;)Ljava/lang/String;
+     149: invokevirtual #24                 // Method java/io/PrintWriter.println:(Ljava/lang/String;)V
+     152: aload_1       
+     153: areturn       
+    Exception table:
+       from    to  target type
+          23    35    38   Class java/lang/IllegalAccessException
+          23    35    49   Class java/lang/reflect/InvocationTargetException
+          23    35    84   Class java/lang/InstantiationException
+          23    35   120   Class java/lang/ExceptionInInitializerError
+
+  private charpov.grader.TestMethod[] getMethods();
+    Code:
+       0: new           #94                 // class charpov/grader/GetMethods
+       3: dup           
+       4: aload_0       
+       5: getfield      #13                 // Field instance:Ljava/lang/Object;
+       8: aload_0       
+       9: getfield      #1                  // Field this$0:Lcharpov/grader/Tester;
+      12: invokestatic  #20                 // Method charpov/grader/Tester.access$100:(Lcharpov/grader/Tester;)Ljava/io/PrintWriter;
+      15: invokespecial #95                 // Method charpov/grader/GetMethods."<init>":(Ljava/lang/Object;Ljava/io/PrintWriter;)V
+      18: invokestatic  #96                 // Method java/security/AccessController.doPrivileged:(Ljava/security/PrivilegedAction;)Ljava/lang/Object;
+      21: checkcast     #97                 // class "[Lcharpov/grader/TestMethod;"
+      24: astore_1      
+      25: aload_1       
+      26: invokestatic  #98                 // Method java/util/Arrays.sort:([Ljava/lang/Object;)V
+      29: aload_1       
+      30: areturn       
+
+  public java.lang.Object call() throws java.lang.Exception;
+    Code:
+       0: aload_0       
+       1: invokevirtual #99                 // Method call:()Lcharpov/grader/TestResult;
+       4: areturn       
+
+  static {};
+    Code:
+       0: ldc_w         #100                // class charpov/grader/Tester
+       3: invokevirtual #101                // Method java/lang/Class.desiredAssertionStatus:()Z
+       6: ifne          13
+       9: iconst_1      
+      10: goto          14
+      13: iconst_0      
+      14: putstatic     #75                 // Field $assertionsDisabled:Z
+      17: return        
+}
+Compiled from "Tester.java"
+class charpov.grader.Tester$DevNull extends java.io.OutputStream {
+  private charpov.grader.Tester$DevNull();
+    Code:
+       0: aload_0       
+       1: invokespecial #2                  // Method java/io/OutputStream."<init>":()V
+       4: return        
+
+  public void write(byte[]);
+    Code:
+       0: return        
+
+  public void write(byte[], int, int);
+    Code:
+       0: return        
+
+  public void write(int);
+    Code:
+       0: return        
+
+  charpov.grader.Tester$DevNull(charpov.grader.Tester$1);
+    Code:
+       0: aload_0       
+       1: invokespecial #1                  // Method "<init>":()V
+       4: return        
+}
+Compiled from "Tester.java"
+public class charpov.grader.Tester$Result {
+  public final long duration;
+
+  public final java.lang.Object target;
+
+  public final java.lang.Object returned;
+
+  public final java.lang.String name;
+
+  public final java.lang.Throwable error;
+
+  static charpov.grader.Tester$Result POISON;
+
+  private charpov.grader.Tester$Result(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Throwable, long);
+    Code:
+       0: aload_0       
+       1: invokespecial #2                  // Method java/lang/Object."<init>":()V
+       4: aload_0       
+       5: aload_1       
+       6: putfield      #3                  // Field name:Ljava/lang/String;
+       9: aload_0       
+      10: aload_2       
+      11: putfield      #4                  // Field target:Ljava/lang/Object;
+      14: aload_0       
+      15: aload_3       
+      16: putfield      #5                  // Field returned:Ljava/lang/Object;
+      19: aload_0       
+      20: aload         4
+      22: putfield      #6                  // Field error:Ljava/lang/Throwable;
+      25: aload_0       
+      26: lload         5
+      28: putfield      #7                  // Field duration:J
+      31: return        
+
+  private java.lang.String returnedAsString();
+    Code:
+       0: aload_0       
+       1: getfield      #5                  // Field returned:Ljava/lang/Object;
+       4: ifnonnull     10
+       7: ldc           #8                  // String null
+       9: areturn       
+      10: aload_0       
+      11: getfield      #5                  // Field returned:Ljava/lang/Object;
+      14: invokevirtual #9                  // Method java/lang/Object.getClass:()Ljava/lang/Class;
+      17: astore_1      
+      18: aload_1       
+      19: ldc_w         #10                 // class java/lang/Boolean
+      22: if_acmpeq     74
+      25: aload_1       
+      26: ldc_w         #11                 // class java/lang/Character
+      29: if_acmpeq     74
+      32: aload_1       
+      33: ldc_w         #12                 // class java/lang/Byte
+      36: if_acmpeq     74
+      39: aload_1       
+      40: ldc_w         #13                 // class java/lang/Short
+      43: if_acmpeq     74
+      46: aload_1       
+      47: ldc_w         #14                 // class java/lang/Integer
+      50: if_acmpeq     74
+      53: aload_1       
+      54: ldc_w         #15                 // class java/lang/Long
+      57: if_acmpeq     74
+      60: aload_1       
+      61: ldc_w         #16                 // class java/lang/Float
+      64: if_acmpeq     74
+      67: aload_1       
+      68: ldc_w         #17                 // class java/lang/Double
+      71: if_acmpne     82
+      74: aload_0       
+      75: getfield      #5                  // Field returned:Ljava/lang/Object;
+      78: invokestatic  #18                 // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+      81: areturn       
+      82: new           #19                 // class java/lang/StringBuilder
+      85: dup           
+      86: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      89: ldc           #21                 // String instance of 
+      91: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      94: aload_1       
+      95: invokevirtual #23                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      98: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     101: invokevirtual #24                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     104: areturn       
+
+  public java.lang.String toString();
+    Code:
+       0: new           #19                 // class java/lang/StringBuilder
+       3: dup           
+       4: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+       7: ldc           #25                 // String [
+       9: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      12: aload_0       
+      13: getfield      #3                  // Field name:Ljava/lang/String;
+      16: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      19: ldc           #26                 // String  on an instance of 
+      21: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      24: aload_0       
+      25: getfield      #4                  // Field target:Ljava/lang/Object;
+      28: invokevirtual #9                  // Method java/lang/Object.getClass:()Ljava/lang/Class;
+      31: invokevirtual #23                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      34: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      37: ldc           #27                 // String , 
+      39: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      42: aload_0       
+      43: getfield      #6                  // Field error:Ljava/lang/Throwable;
+      46: ifnonnull     56
+      49: aload_0       
+      50: invokespecial #28                 // Method returnedAsString:()Ljava/lang/String;
+      53: goto          66
+      56: aload_0       
+      57: getfield      #6                  // Field error:Ljava/lang/Throwable;
+      60: invokevirtual #9                  // Method java/lang/Object.getClass:()Ljava/lang/Class;
+      63: invokevirtual #23                 // Method java/lang/Class.getName:()Ljava/lang/String;
+      66: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      69: ldc           #27                 // String , 
+      71: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      74: aload_0       
+      75: getfield      #7                  // Field duration:J
+      78: lconst_0      
+      79: lcmp          
+      80: ifge          88
+      83: ldc           #29                 // String ?
+      85: goto          95
+      88: aload_0       
+      89: getfield      #7                  // Field duration:J
+      92: invokestatic  #30                 // Method java/lang/String.valueOf:(J)Ljava/lang/String;
+      95: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      98: ldc           #31                 // String ]
+     100: invokevirtual #22                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     103: invokevirtual #24                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     106: areturn       
+
+  charpov.grader.Tester$Result(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Throwable, long, charpov.grader.Tester$1);
+    Code:
+       0: aload_0       
+       1: aload_1       
+       2: aload_2       
+       3: aload_3       
+       4: aload         4
+       6: lload         5
+       8: invokespecial #1                  // Method "<init>":(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;J)V
+      11: return        
+
+  static {};
+    Code:
+       0: new           #32                 // class charpov/grader/Tester$Result
+       3: dup           
+       4: aconst_null   
+       5: aconst_null   
+       6: aconst_null   
+       7: aconst_null   
+       8: lconst_0      
+       9: invokespecial #1                  // Method "<init>":(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;J)V
+      12: putstatic     #33                 // Field POISON:Lcharpov/grader/Tester$Result;
+      15: return        
+}

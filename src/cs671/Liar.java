@@ -2,32 +2,46 @@ package cs671;
 import java.util.*;
 import java.util.Collections.*;
 import java.util.EnumSet.*;
-import java.lang.reflect.*;
   /**
-     Liar Class
+   *Liar Class<br>
+   *A guessing game for liars.
+   *This class implements a guesser that asks questions to a user to find
+   *a secret object. The user can lie, but no more than a
+   *predetermined  number of times. When found,
+   *the secret object is returned as an instance of Liar.Secret,
+   *which includes the number of times
+   *the user lied during the process.
    */
 public class Liar<T> implements Guesser<Liar.Secret<T>>{
-  boolean init=false;
-  boolean qmade=false;
-  boolean solved=false;
-  //This is just a macro for myself
-  //So its not documented
-  static void println(String arg){
+  //internal variables to insure methods are called in the proper order
+  private boolean init=false;
+  private boolean qmade=false;
+  private boolean solved=false;
+  //This is just a macro for myself, to make printing eaiser
+  //mainly for debugging 
+  private static void println(String arg){
     System.out.println(arg);
   }
+  //instance of the LiarTable class
   LiarTable liarTable;
+  //internal variable to hold the given list of candidates
   ArrayList<T> candidates;
+  //internal variable to hold the number of candidates
   int items;
   /**
-     MaxLies variable
+   *MaxLies variable<br>
+   *Number of times a user can lie
    */
   public final int maxLies;
   /**
-     Name variable
+   *Name variable<br>
+   *Name of objects
    */
   public final String name;
     /**
-     Has Solved Method
+     *Has Solved Method<br>
+     *Tests whether the problem is solved or not.
+     *@return true iff the problem has been solved
    */
   public boolean hasSolved(){
     if(init != true){
@@ -36,7 +50,12 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     return liarTable.hasSolved();
   }
     /**
-     Progress Method
+     *Progress Method<br>
+     *Indicates progress towards solving the problem. After
+     *initialization,  he value returned is 0 (unless the problem is
+     *immediately solved, in which case it is 1). It always increases
+     *as the guessing process progresses. It is exactly 1 after the
+     *problem is solved.
    */
   public double progress(){
     return(1-(liarTable.progress()/liarTable.total));
@@ -46,7 +65,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   //Type of Secrets, just used an interface to outside
   //All internal manipulations done w/LiarTable
     /**
-     Secret Class
+     *Secret Class<br>
    */
   public static class Secret<E> {
     int lies;
@@ -55,20 +74,20 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       this.lies=lies;
       this.secret=secret;
     }
-      /**
-     Get Lies method
+    /**
+     *getLies method<br>
    */
     public int getLies(){
       return lies;
     }
   /**
-     Get Secret method
+   *getSecret method<br>
    */
     public E getSecret(){
       return secret;
     }
   /**
-     to String method
+   *toString method<br>
    */
     public String toString(){
       return String.format("Your object was %s and you told %d lies",secret,lies);//not sure how to format for generics, and should object be name?
@@ -77,9 +96,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
 
 
   /**
-     LiarTable class
-     Data structure to hold information about items and lies
-     Does all the manipulating and sorting of objects
+   *LiarTable class<br>
+   *Data structure to hold information about items and lies
+   *Does all the manipulating and sorting of objects.
+   *Is a generic class, but will always be same class as liar instance
   */
   class LiarTable {
     TreeMap<Integer,ArrayList<T>> top;
@@ -87,7 +107,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     TreeMap<Integer,ArrayList<T>> liarList;
     double total;//# of total lies at star
     /**
-       LiarTable Constructor
+     *LiarTable Constructor<br>
     */
     LiarTable(ArrayList<T> candidates,int lies){
       this.top=new TreeMap<>();
@@ -103,21 +123,22 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
 
     /**
-       Increment lies on top/bottom
+     *Increment lies on top/bottom
+     *
+     *Given a boolean based on the users previous answer
+     *increments the lie count on the group of items the user's
+     *item was claimed not to be in, if an item is over the
+     *max lies it is removed from the pool of possible choices.
     */
     @SuppressWarnings("unchecked")
     void increment(boolean inTop){
-      //println("increment\n");
-      //might use teritary operator here, but removed for debugging
       TreeMap<Integer,ArrayList<T>> liarList;
       if (inTop==true){
         liarList=bottom;
       } else {
         liarList=top;
       }
-      //println(liarList.toString());
       ArrayList<T> temp;
-      //do stuff
       for (int i=maxLies;i>0;i--){
         try{
           //warnings suppressed for this,we're casting a clone of
@@ -131,20 +152,22 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       }
       //temp=liarList.get(0);...keeping just in case
       liarList.get(0).clear();
-      //println(top.toString());
-      //println(bottom.toString());
     }
 
     /**
-       Swap part of top and bottom w/each other
+     *Swap part of top and bottom w/each other
+     *
+     *The items left as possible correct answers are
+     *distributed over the top and bottom maps in such
+     *a way that there will always be items on the top and
+     *bottom maps and that the questions will not fall
+     *into an infinite loop
     */
     void swap(){
       //move the last n/2 items from top to temp array
       //move the first n/2+n%2 items from bottom to temp array
       //merge top and bottom, this is new top
       //temp array is new bottom
-      //println("swap\n");
-      //println("before\n"+top.toString()+'\n'+bottom.toString());
       ArrayList<T> up;
       ArrayList<T> down;
       ArrayList<T> temp;
@@ -153,7 +176,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         up=top.get(i);
         down=bottom.get(i);
         temp=new ArrayList<>(up.size());
-        //with temp variables, Should this have a new namespace?
+        //manipulation with temp variables
         if (down.size()==1){
           up.addAll(down);
           down.clear();
@@ -171,14 +194,16 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         top.put(i,up);
         bottom.put(i,temp);
       }
-      //println("After\n"+top.toString()+'\n'+bottom.toString());
     }
 
     /**
+       Progress method
+
        return progress as a double giving the total number
        of possible lies left, this is compaired w/the value
        total ,which gives total lies ever possible, to get
        the actual progress value.
+       @returns progress as a decimal from 0.0 to 1.0
     */
     double progress(){
       //sum lies left per object over all objects
@@ -191,13 +216,17 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
 
     /**
-       if only 1 item left than we've solved the problem
-       if not keep going
+     *hasSolved Method
+     *
+     *Fail fast method of determining if the item has
+     *been found. sums the size of the arrays in each
+     *item in the top and bottom maps
+     *if the sum is ever greater than 1 it returns 
+     *immedidately
+     * @returns true if the item found false otherwise
     */
     boolean hasSolved(){
-      //println("hasSolved\n");
       int sum=top.get(0).size()+bottom.get(0).size();
-      //println(String.format("sum:%d",sum));
       for (int i=1;i<=maxLies;i++){
         if (sum>1){
           return false;
@@ -225,13 +254,19 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     items=candidates.size();
     try{
       //check if candidates is empty
-      //throw new IllegalArgumentException("empty candidates list");
+      if (candidates.size() == 0){
+        throw new IllegalArgumentException("empty candidates list");
+      }
       //check if lies <0
-      //throw new IllegalArgumentException("Can't Have negitive lies");
+      if (lies < 0){
+        throw new IllegalArgumentException("Can't Have negitive lies");
+      }
       //check if name == null
-      //throw new IllegalArgumentException("Unspecified Name");
+      if (name.equals(null)){
+        throw new IllegalArgumentException("Unspecified Name");
+      }
       } catch (IllegalArgumentException ex){
-      //println(ex.getMessage());
+      println(ex.getMessage());
     }
     this.maxLies=lies;
     this.name=name;
@@ -240,7 +275,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
   //Get Secret
     /**
-     Get Secret Method
+     *getSecret Method
    */
   public Secret<T> getSecret(){
     if (init!=true || solved!=true){
@@ -261,7 +296,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-     Initialize method
+   *initialize method
    */
   public String initialize(){
     //reset liarTable
@@ -271,7 +306,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-     make Question method
+   *makeQuestion method
    */
   public String makeQuestion(){
     if (init!=true || qmade == true){
@@ -285,13 +320,14 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         question.append(' ');
       }
     }
-    question.deleteCharAt(question.length()-1);//length-1?
+    question.deleteCharAt(question.length()-1);
     question.append('?');
     qmade=true;
     return question.toString();
   }
   /**
-     no method
+   *no method
+   *{@inheritDoc}
    */
   public void no(){
     if (init!=true || qmade!=true){
@@ -304,7 +340,8 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-     yes method
+   *yes method
+   *{@inheritDoc}
    */
   public void yes(){
     if (init!=true || qmade!=true){
@@ -316,7 +353,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     qmade=false;
   }
   /**
-     select Candidates method
+   *selectCandidates method
    */
   public int selectCandidates(int n){
     if (n<=0){
@@ -324,7 +361,6 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     } else if (n>=candidates.size()){
       return candidates.size();
     }
-    //Random rand=new Random();
     Collections.shuffle(candidates);
     candidates=new ArrayList<T>(candidates.subList(0,n));
     items=n;

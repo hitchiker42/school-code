@@ -1,0 +1,102 @@
+package cs671;
+import java.lang.reflect.*;
+import java.util.*;
+import java.io.*;
+//Testable is for classes
+//@Test is for methods
+
+/**
+ *Tester Class
+ */
+public class Tester implements Runnable{
+  //for my convience
+  PrintWriter output=new PrintWriter(new OutputStreamWriter(System.err),true);
+  void println(String text){
+    System.out.println(text);
+  }
+  /**
+   *Varagargs Tester Constructor
+   */
+  @SafeVarargs
+  public Tester(Class<? extends Testable>...classes){
+  }
+  /**
+   *Collection Tester Constructor
+   */
+  public Tester(Collection<Class<? extends Testable>> classes){
+  }
+  /**
+   *SetPrint Writer Method
+   *Sets the tester output. By default, the output is System.err.
+   * It is valid to set the output to null,
+   * in which case the tester is completely silent.
+   */
+  public void setPrintWriter(PrintWriter W){
+    output=W;
+  }
+  //need to revise to fit my implimentation
+  /**
+   *Run Method
+   *Runs the tests. All the classes are processed in the order in which
+   *they were given. For each class, all the tests are run
+   *on the same instance in order of the method names.
+   *If no instance can be created, the class is skipped
+   *with an error message. If method beforeMethod fails or
+   *returns false, the corresponding test is skipped with
+   *a warning message. After each test, method afterMethod
+   *is run and a warning is displayed if it fails.
+   *
+   *In general, no-argument methods are valid test methods
+   *if they are annotated, even when they are non-public or non-void.
+   *Static method and methods that require arguments are ignored.
+   *A warning is displayed if they are test-annotated.
+   */
+  public void run(){
+    //ArrayList<Class> classes;//define somewhere else
+    //foo.getAnnotation(Test.class)
+    //for now say foo is a class object to run tests for
+    ArrayDeque<Method> functs;
+    for (i : foo.getMethods()){
+      if(i.getAnnotation(Test.class)!=true){
+        continue;
+      } else if (i.getParameterTypes() !=0){
+        output.println(String.format("Warning method %s is annotated with @Test but takes parameters",i.toString()));
+        continue;
+      } else if (isStatic(i.getModifiers())){
+        output.println(String.format("Waring static meth %s is annotated with @Test",i.toString()));
+        continue;
+      } else {
+        functs.addLast(i);
+      }
+    }
+    try {
+      Object temp=foo.newInstance()
+    } catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
+      output.println(String.format("Error Could not instantiate %s",foo.toString()));
+    }//is there even anything to catch?
+    
+  }
+  /**
+   *get Results Method
+   *Test results. This method returns a list that contains
+   * a TestResult object for each test that was run
+   *(in the order the test method were actually run).
+   *The returned list can be modified and modifications will
+   *affect subsequent calls to getResults (i.e., this method
+   *does not make copies of the list).
+   */
+  public List<TestRusult> getResults(){
+  }
+  /**
+   *Main Method
+   *Starts a console-based application. 
+   *Command line arguments are the names of the classes 
+   *to be tested. The application produces a summary output 
+   *of tests that succeeded and tests that failed.
+   */
+  public static void main(String[] args){
+    //parse arguments and put into some kind of structure
+    //test arguments to see if class exists & if they are testable
+    //
+  }
+}
