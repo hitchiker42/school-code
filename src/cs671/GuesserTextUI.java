@@ -9,22 +9,33 @@ import java.util.*;//For now, but simplify to only classes I need
  */
 public class GuesserTextUI {
   //I'm lazy and this makes printing things eaiser
-  static void println(String arg){
+  private static void println(String arg){
     System.out.println(arg);
   }
-
+  //intput stream
   BufferedReader input;
+  //output stream
   PrintWriter output;
+  //guesser instance
   Guesser<?> guesser;
-  String question,answer;
+  //string containing question to be asked
+  String question;
+  //string containing users answer
+  String answer;
   /**
-     GuesserTextUI initalizer
+     GuesserTextUI initalizer, using stdout/stdin
    */
   public GuesserTextUI(Guesser<?> g){
     this.output=new PrintWriter(new OutputStreamWriter(System.out),true);
     this.input=new BufferedReader(new InputStreamReader(System.in));
     this.guesser=g;
   }
+  /**
+     GuesserTextUI initializer, using user given I/O
+     Builds a user interface for the given guesser. 
+     Questions are displayed on output and user input 
+     is read from input.
+   */
   public GuesserTextUI(Guesser<?> g, Reader input, Writer output){
     this.output=new PrintWriter(output);
     this.input=new BufferedReader(input);//may change
@@ -32,25 +43,22 @@ public class GuesserTextUI {
   }
   /**
      Play method
+     @return the number of games played
    */
   public int play(){
     boolean play=true;
     int games=0;
-    //Main Loop Goes here
     while (play==true){
-      //println("what's going on");
       guesser.initialize();
       while (guesser.hasSolved() != true ){
-        //println("initalized");
         question=guesser.makeQuestion();
         while(true){
           output.println(question);
           try{
-            //answer=new Character((char)input.read()).toString();
             answer=input.readLine();
           } catch (IOException ex){
             println("Input somehow failed");
-            return 3;
+            return 0;
           }
           if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
             guesser.yes();
@@ -65,11 +73,10 @@ public class GuesserTextUI {
           }
         }
         double progress=guesser.progress();
-        //println((String.format("I am %.0f %% complete",100*progress)));
         output.println(String.format("I am %.0f %% complete",100*progress));
       }
-      String number=guesser.getSecret().toString(); //need to make generic
-      output.println(String.format("Your number was %s",number));
+      String secret=guesser.getSecret().toString();
+      output.println(String.format("Your secret was %s",secret));
       games++;
       while(true){
         output.println("Play Again?(y/n)");
@@ -77,7 +84,7 @@ public class GuesserTextUI {
           answer=input.readLine();
         } catch (IOException ex){
           println("Input somehow failed");
-          return 3;
+          return 0;
         }
         if (answer.toLowerCase().equals("y") || answer.toLowerCase().equals("yes")){
           play=true;
@@ -90,20 +97,21 @@ public class GuesserTextUI {
         }
       }
     }
-    //check API if i have to return games like this do so
-    //but if i can print games and return 0
     output.println(String.format("You played %d games",games));
     return games;
   }
   /**
-     help method 
-     How to use the Program, prints on -h, --help or no args
+   *help method
+   *How to use the Program, prints on -h, [-]-help or no args
   */
   static void help() {
+    //personally it would bother me if I couldn't call
+    //a program with -h and get help
+    //thus the -h/--help parameters
     String usage="Usage: TextUI -hilo min max\n"
       +"or: TextUI -liar #lies name1 [name2 ...]\n"
       +"or: TextUI -liar #lies -file filename #names\n"
-      +"Options: -h,--help print this help and exit\n";
+      +"Options: -h,[-]-help print this help and exit\n";
     System.out.println(usage);
     return;
   }
@@ -111,8 +119,7 @@ public class GuesserTextUI {
      Main method
    */
   public static void main(String [] args) throws IOException{
-    //Test this bit, I need to be surce this is the right way to do this
-    if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help")){
+    if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help") || args[0].equals("-help")){
       help();
     } else if (args[0].equals("-liar")){
       //liar cases
@@ -122,9 +129,13 @@ public class GuesserTextUI {
       }
       HashSet<String> candidates = new HashSet<>();
       /*I can think of no reasonably implimentable means of finding
-        the type of the lies, so they are all going to be strings
-      */
+        the type of the lies, so they are all going to be strings*/
       String name="String";
+      //I know I could probably clean this up as there is a lot
+      //of duplicate code for creating a liar instance with
+      //or without a file, but as there are only 2 cases and
+      //they're already written out it would be more trouble
+      //than it's worth to attempt to abstract it
       //using a file
       if (args[2].equals("-file")){
         if (args.length != 5){
@@ -132,11 +143,9 @@ public class GuesserTextUI {
           return;
         }
         try{
-          //println("using A file");
           int lies= new Integer(args[1]);
           File file=new File(args[3]);
           assert(file.exists()==true);
-          //println(file.toString());
           BufferedReader fileRead=new BufferedReader(new FileReader(file));
           String word=fileRead.readLine();
           while (word!=null){
@@ -163,13 +172,12 @@ public class GuesserTextUI {
           return;
         }
       } else{
-        //using stdout
+        //using stdin/stdout
         try{
           int lies= new Integer(args[1]);
           for (int i=2;i<args.length;i++){
             candidates.add(args[i]);
           }
-          //test for some option
           println(candidates.toString());
           GuesserTextUI game=new GuesserTextUI(new Liar<>(candidates,lies,name));
           assert(!game.equals(null));
@@ -180,6 +188,7 @@ public class GuesserTextUI {
         }
       }
     } else if (args[0].equals("-hilo")){
+      //hilo case
       if(args.length < 2){
         help();
       } else try{
@@ -193,6 +202,8 @@ public class GuesserTextUI {
         }
     }
     else {
+      //should rarely get here as most incorect args are delt with in
+      //the hilo and liar cases and no args prints a help message
       println("ERROR");
       return;
     }

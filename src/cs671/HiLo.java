@@ -3,15 +3,18 @@ package cs671;
    HiLo Class
  */
 public class HiLo implements Guesser<Integer> {
-  int min,max,x;
-  int range_min,range_max;
+  //min max and number to ask, min & max are changeable over
+  //each game
+  private int min,max,x;
   double total;
   Range range;
-  boolean init=false;
-  boolean solved=false;
-  boolean qmade=false;
+  private boolean init=false;
+  private boolean solved=false;
+  private boolean qmade=false;
   /**
-     Range Class
+   *Range Class
+   *Really simple class to hold the minimum and maximum values
+   *over multiple games.
    */
   static class Range {
     static int min;
@@ -22,7 +25,7 @@ public class HiLo implements Guesser<Integer> {
     }
   }
   /**
-     HiLo Constructor
+   *HiLo Constructor
    */
   public HiLo(int min,int max){
     if (min>max){
@@ -35,21 +38,20 @@ public class HiLo implements Guesser<Integer> {
     this.total=(double)(max-min);
   }
   /**
-     Get Secret method
+   *Get Secret method
    */
   public Integer getSecret(){
     if (solved != true){
-      //throw new IllegalStateException() ;
+      throw new IllegalStateException() ;
     }
     return x;
   }
   /**
-     Has Solved method
+   *Has Solved method
    */
   public boolean hasSolved(){
-    //System.out.println(String.format("min:%d,max:%d",min,max));
     if (init!=true){
-      //throw new IllegalStateException();
+      throw new IllegalStateException();
     }
     if (this.min == this.max){
       x=min;
@@ -61,7 +63,7 @@ public class HiLo implements Guesser<Integer> {
     }
   }
   /**
-     Initalize Method
+   *Initalize Method
    */
   public String initialize(){
     max=Range.max;
@@ -70,19 +72,19 @@ public class HiLo implements Guesser<Integer> {
     return "";
   }
   /**
-     Make Question Method
+   *Make Question Method
    */
   public String makeQuestion(){
     if (init != true || solved==true || qmade==true){
       throw new IllegalStateException();
     }
     qmade=true;
-    x=((min + max)/2+(min + max)%2); //might not work like this, b/c of rounding
+    x=((min + max)/2+(min + max)%2); //rounds up
     String question=String.format("Is your number greater than or equal to %d",x);
     return question;
   }
   /**
-     No method
+   *no method
    */
   public void no(){
     if (init!=true || qmade!=true){
@@ -92,7 +94,7 @@ public class HiLo implements Guesser<Integer> {
     this.max=(x-1);
   }
   /**
-     Yes Method
+   *yes Method
    */
   public void yes(){
     if (init!=true || qmade!=true){
@@ -102,9 +104,13 @@ public class HiLo implements Guesser<Integer> {
     this.min=x;
   }
   /**
-     progress method
+   *progress method
+   *Measures progress my number of items remaining over
+   *the total number of items.
    */
   public double progress(){
+    //scaling of progress is a bit off because it uses remaining/total
+    //but it works and so thats the way I'm leaving it.
     if (init!=true){
       throw new IllegalStateException();
     }
