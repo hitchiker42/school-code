@@ -11,6 +11,7 @@ import java.util.EnumSet.*;
    *the secret object is returned as an instance of Liar.Secret,
    *which includes the number of times
    *the user lied during the process.
+   *@author Tucker DiNapoli from api by Michel Charpentier
    */
 public class Liar<T> implements Guesser<Liar.Secret<T>>{
   //internal variables to insure methods are called in the proper order
@@ -18,7 +19,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   private boolean qmade=false;
   private boolean solved=false;
   //This is just a macro for myself, to make printing eaiser
-  //mainly for debugging 
+  //mainly for debugging
   private static void println(String arg){
     System.out.println(arg);
   }
@@ -29,19 +30,16 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   //internal variable to hold the number of candidates
   int items;
   /**
-   *MaxLies variable<br>
    *Number of times a user can lie
    */
   public final int maxLies;
   /**
-   *Name variable<br>
    *Name of objects
    */
   public final String name;
-    /**
-     *Has Solved Method<br>
-     *Tests whether the problem is solved or not.
-     *@return true iff the problem has been solved
+  /**
+   *Tests whether the problem is solved or not.
+   *@return true iff the problem has been solved
    */
   public boolean hasSolved(){
     if(init != true){
@@ -50,12 +48,13 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     return liarTable.hasSolved();
   }
     /**
-     *Progress Method<br>
      *Indicates progress towards solving the problem. After
      *initialization,  he value returned is 0 (unless the problem is
      *immediately solved, in which case it is 1). It always increases
      *as the guessing process progresses. It is exactly 1 after the
      *problem is solved.
+     *@return a double from 0.0 to 1.0 indicating progress toward solving the
+     *problem
    */
   public double progress(){
     return(1-(liarTable.progress()/liarTable.total));
@@ -81,7 +80,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       return lies;
     }
   /**
-   *getSecret method<br>
+   *The answer to the problem. This method should be called after hasSolved
+   *returns true to retreive the solution to the problem.
+   *@return the answer to the problem, if known
    */
     public E getSecret(){
       return secret;
@@ -96,8 +97,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
 
 
   /**
-   *LiarTable class<br>
-   *Data structure to hold information about items and lies
+   *Data structure to hold information about items and lies.
    *Does all the manipulating and sorting of objects.
    *Is a generic class, but will always be same class as liar instance
   */
@@ -197,13 +197,11 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
 
     /**
-       Progress method
-
-       return progress as a double giving the total number
-       of possible lies left, this is compaired w/the value
-       total ,which gives total lies ever possible, to get
-       the actual progress value.
-       @returns progress as a decimal from 0.0 to 1.0
+     *return progress as a double giving the total number
+     *of possible lies left, this is compaired w/the value
+     *total ,which gives total lies ever possible, to get
+     *the actual progress value.
+     *@return progress as a decimal from 0.0 to 1.0
     */
     double progress(){
       //sum lies left per object over all objects
@@ -216,14 +214,12 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
 
     /**
-     *hasSolved Method
-     *
      *Fail fast method of determining if the item has
      *been found. sums the size of the arrays in each
      *item in the top and bottom maps
      *if the sum is ever greater than 1 it returns 
      *immedidately
-     * @returns true if the item found false otherwise
+     * @return true if the item found false otherwise
     */
     boolean hasSolved(){
       int sum=top.get(0).size()+bottom.get(0).size();
@@ -248,7 +244,15 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
 
   //Constructor
   /**
-     Liar Constructor
+     *Builds a guesser that will find the secret object among a list of
+     *candidates, assuming  a maximum number of lies.
+     *@param candidates - a list of objects, which includes the secret to be
+     *found
+     *@param lies - the maximum number of times a use can lie
+     *@param name - a word that's used to refer to the objects from the list
+     *(string,  object, animal, color, ...)
+     *@throws IllegalArgumentException - if the set of candidates is empty, the
+     *number of lies is negative, or the name is null
    */
   public Liar(Set<? extends T> candidates, int lies, String name){
     items=candidates.size();
@@ -292,6 +296,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         break;
         }
     }
+    solved=false;
     return(ans);
   }
 
@@ -309,7 +314,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
    *makeQuestion method
    */
   public String makeQuestion(){
-    if (init!=true || qmade == true){
+    if (init!=true || qmade == true || solved == true){
       throw(new IllegalStateException());
     }
     StringBuilder question = new StringBuilder(String.format("Is your %s one of: ",name));
@@ -326,7 +331,6 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     return question.toString();
   }
   /**
-   *no method
    *{@inheritDoc}
    */
   public void no(){
@@ -340,7 +344,6 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-   *yes method
    *{@inheritDoc}
    */
   public void yes(){
@@ -353,7 +356,22 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     qmade=false;
   }
   /**
-   *selectCandidates method
+   *Sets an upper bound on the number of objects to be used in the guessing
+   *process. By default,  all the objects provided at construction time are
+   *used. This methods selects a randomly chosen subset of objects of the
+   *specified size. The selection relies on java.util.Collections.shuffle for
+   *randomness.
+   *<p>
+   *For instance, if a Liar object is created with candidates {A,B,C,D} and
+   *selectCandidates(2) is called, 2 candidates are chosen (say, A and C) and
+   *used for the next game. B and D are then not used at all and won't appear in
+   *any question. selectCandidates() should be called after a game has finished
+   *and before the next game is initialized. If called at other times, it throws
+   *an IllegalStateException.
+   *<p>
+   *The method is most useful when a Liar instance is created with a large set
+   *(e.g., a dictionary of all English words) but we care to play with only a
+   *few elements from this set (e.g., 10 words, chosen randomly). 
    */
   public int selectCandidates(int n){
     if (n<=0){
