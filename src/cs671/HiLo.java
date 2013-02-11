@@ -1,6 +1,10 @@
 package cs671;
 /**
- *HiLo Class
+ *A simple guessing game. This game illustrates the Guesser interface. The user
+ *picks a number between a specified minimum and maximum and the guesser will
+ *discover the number by a repeated interaction of YES/NO questions. It proceeds
+ *by dichotomy, splitting the range of possible values in half with each
+ *question. After it's found, the number is returned as an instance of Integer. 
  *@author Tucker DiNapoli from api by Michel Charpentier
  */
 public class HiLo implements Guesser<Integer> {
@@ -13,7 +17,7 @@ public class HiLo implements Guesser<Integer> {
   private boolean solved=false;
   private boolean qmade=false;
   /**
-   *Range Class
+   *Range of values, kept via min and max values.
    *Really simple class to hold the minimum and maximum values
    *over multiple games.
    */
@@ -22,11 +26,18 @@ public class HiLo implements Guesser<Integer> {
     static int max;
     Range(int min,int max){
       Range.min=min;
+      //seems a bit cheap to do this, but because abs(int_max)=abs(int_min)-1
+      //it turns out to be necessary
+      if (min==Integer.MIN_VALUE){
+        Range.min=min+1;
+      }
       Range.max=max;
     }
   }
   /**
-   *HiLo Constructor
+   *Builds an instance of the engine for the given minimum and maximum.
+   *@param min - the lower bound of the range
+   *@param max - the upper bounh of the range
    */
   public HiLo(int min,int max){
     if (min>max){
@@ -35,8 +46,9 @@ public class HiLo implements Guesser<Integer> {
     this.max=max;
     this.min=min;
     range= new Range(min,max);
-    this.x=(min+max)/2;
-    this.total=(double)(max-min);
+    this.x=(int)((long)min+(long)max)/2;
+    this.total=(double)((long)max-(long)min);
+    //if (min==Integer.MIN_VALUE
   }
   /**
    *Get Secret method
@@ -81,9 +93,9 @@ public class HiLo implements Guesser<Integer> {
       throw new IllegalStateException();
     }
     qmade=true;
-    x=((min + max)/2+(min + max)%2); //rounds up
+    x=(int)(((long)min + (long)max)/2+((long)min + (long)max)%2); //rounds up
     if(min<0 || max<0){
-      x=(min + max)/2;
+      x=(int)((long)min + (long)max)/2;
     }
     String question=String.format("Is your number greater than or equal to %d",x);
     return question;
@@ -123,7 +135,7 @@ public class HiLo implements Guesser<Integer> {
     if (init!=true){
       throw new IllegalStateException();
     }
-    Double current=(double)(max-min);
+    Double current=(double)((long)max-(long)min);
     return(1-current/total);
   }
 }
