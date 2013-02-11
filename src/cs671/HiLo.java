@@ -83,7 +83,7 @@ public class HiLo implements Guesser<Integer> {
     max=Range.max;
     min=Range.min;
     init=true;
-    return "";
+    return String.format("Pick a number between %d and %d",min,max);
   }
   /**
    *Make Question Method
