@@ -5,12 +5,13 @@ import java.io.*;
 import java.util.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/
 /**
- * simple, text-based user interface for guessing games. This interface is
- * constructed from a Guesser object and offers a play method. This method is
- * blocking (i.e., it does not return until the user is done playing) and
- * returns the number of games played. 
+ *A simple, text-based user interface for guessing games. This interface is
+ *constructed from a Guesser object and offers a play method. This method is
+ *blocking (i.e., it does not return until the user is done playing) and
+ *returns the number of games played. 
  *This class also implements a command-line program to start a HiLo or a Liar
  *guessing session
+ *@author Tucker DiNapoli from api by Michel Charpentier
  */
 public class GuesserTextUI {
   //I'm lazy and this makes printing things eaiser
@@ -28,7 +29,7 @@ public class GuesserTextUI {
   //string containing users answer
   String answer;
   /**
-     GuesserTextUI initalizer, using stdout/stdin
+   *Builds a user interface for the given guesser using stdout/stdin
    */
   public GuesserTextUI(Guesser<?> g){
     this.output=new PrintWriter(new OutputStreamWriter(System.out),true);
@@ -36,10 +37,9 @@ public class GuesserTextUI {
     this.guesser=g;
   }
   /**
-     GuesserTextUI initializer, using user given I/O
-     Builds a user interface for the given guesser. 
-     Questions are displayed on output and user input 
-     is read from input.
+   *Builds a user interface for the given guesser. 
+   *Questions are displayed on output and user input 
+   *is read from input.
    */
   public GuesserTextUI(Guesser<?> g, Reader input, Writer output){
     this.output=new PrintWriter(output);
@@ -47,8 +47,17 @@ public class GuesserTextUI {
     this.guesser=g;
   }
   /**
-     Play method
-     @return the number of games played
+   *Starts the interaction with the user. This method will only return when the
+   *user is done playing. 
+   *'y' (followed by a newline) is accepted as a valid input for 'yes';
+   *similarly, 'n' means 'no'. This implementation accepts the answers 'y' 'n'
+   *'yes' and 'no' with any captialization as valid answers  Invalid answers
+   *from the user do not end the interaction. Instead, the method keeps asking
+   *until it gets a yes or no. 
+
+   *Upon termination, this method flushes the output writer but does not close
+   *it, nor does it close the input reader.
+   *@return the number of games played
    */
   public int play(){
     boolean play=true;
@@ -121,7 +130,14 @@ public class GuesserTextUI {
     return;
   }
   /**
-     Main method
+   *Starts a command-line program. This program can be started in 3 different
+   *ways: 
+   *Usage: TextUI -hilo min max
+   *or: TextUI -liar #lies name1 [name2 ...]
+   *or: TextUI -liar #lies -file filename #names
+   *The last form takes the names of the secret objects from a file and the last
+   *parameter specifies how many of these are actually used in the game. 
+   *@throws IOException - if the file of names can not be opened and read
    */
   public static void main(String [] args) throws IOException{
     if (args.length <= 0 || args[0].equals("-h") || args[0].equals("--help") || args[0].equals("-help")){

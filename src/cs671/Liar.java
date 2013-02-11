@@ -64,7 +64,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   //Type of Secrets, just used an interface to outside
   //All internal manipulations done w/LiarTable
     /**
-     *Secret Class<br>
+     *The type of secrets produced by this guesser. Secrets are simply a pair:
+     *secret object and number of times the user lied. 
+     *@param<E> E - the type of secret objects, which is T, the type parameter
+     *of the Liar class. 
    */
   public static class Secret<E> {
     int lies;
@@ -74,24 +77,31 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       this.secret=secret;
     }
     /**
-     *getLies method<br>
-   */
+     *The number of times the user lied
+     */
     public int getLies(){
       return lies;
     }
-  /**
-   *The answer to the problem. This method should be called after hasSolved
-   *returns true to retreive the solution to the problem.
-   *@return the answer to the problem, if known
-   */
+    /**
+     *The secret that was discovered, of type T
+     */
     public E getSecret(){
       return secret;
     }
   /**
-   *toString method<br>
+   *the string representation of secret followed by " (with X lies)", where X >
+   *1 is the number of times the user lied, or by " (with 1 lie)" or by " (with
+   *no lie)" 
    */
     public String toString(){
-      return String.format("Your object was %s and you told %d lies",secret,lies);//not sure how to format for generics, and should object be name?
+      if (lies>1) {
+      return secret.toString()+ String.format(" with %d lies",lies);
+      } else if (lies==1){
+        return secret.toString()+ String.format(" with %d lie",lies);
+      } else if (lies==0){
+        return secret.toString()+" with no lies";
+      }
+      return "";
     }
   }
 
@@ -278,8 +288,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     this.liarTable=new LiarTable(this.candidates,lies);
   }
   //Get Secret
-    /**
-     *getSecret Method
+  /**
+   *The answer to the problem. This method should be called after hasSolved
+   *returns true to retreive the solution to the problem.
+   *@return the answer to the problem, if known
    */
   public Secret<T> getSecret(){
     if (init!=true || solved!=true){
@@ -301,7 +313,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-   *initialize method
+   *{@inheritDoc}
    */
   public String initialize(){
     //reset liarTable
@@ -311,13 +323,15 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   }
 
   /**
-   *makeQuestion method
+   *Generates a new question. The previous question must be answered (using yes
+   *or no) before a new question is generated.
+   *@return the question, as a string to display to the user
    */
   public String makeQuestion(){
     if (init!=true || qmade == true || solved == true){
       throw(new IllegalStateException());
     }
-    StringBuilder question = new StringBuilder(String.format("Is your %s one of: ",name));
+    StringBuilder question = new StringBuilder(String.format("Is the secret %s among ",name));
     for (ArrayList<T> i:liarTable.top.values()){
       Iterator<T> q = i.iterator();
       while (q.hasNext()){
