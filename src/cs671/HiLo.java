@@ -38,6 +38,8 @@ public class HiLo implements Guesser<Integer> {
    *Builds an instance of the engine for the given minimum and maximum.
    *@param min - the lower bound of the range
    *@param max - the upper bounh of the range
+   *@throws IllegalArgumentException - if the specified range is empty, i.e.,
+   * min> max 
    */
   public HiLo(int min,int max){
     if (min>max){
@@ -51,7 +53,7 @@ public class HiLo implements Guesser<Integer> {
     //if (min==Integer.MIN_VALUE
   }
   /**
-   *Get Secret method
+   *{@inheritDoc}
    */
   public Integer getSecret(){
     if (solved != true){
@@ -61,7 +63,7 @@ public class HiLo implements Guesser<Integer> {
     return x;
   }
   /**
-   *Has Solved method
+   *{@inheritDoc}
    */
   public boolean hasSolved(){
     if (init!=true){
@@ -77,7 +79,10 @@ public class HiLo implements Guesser<Integer> {
     }
   }
   /**
-   *Initalize Method
+   *Initalizes the guesser. This method must be the first called after the
+   *guesser is created.
+   *@return the string "Pick a number between X and Y", where X is the minimum
+   *and Y is the maximum, as specified when the instance was constructed 
    */
   public String initialize(){
     max=Range.max;
@@ -86,7 +91,9 @@ public class HiLo implements Guesser<Integer> {
     return String.format("Pick a number between %d and %d",min,max);
   }
   /**
-   *Make Question Method
+   *Generates a new question. The previous question must be answered (using yes
+   *or no) before a new question is generated.
+   *@return the question as a string to display to the user
    */
   public String makeQuestion(){
     if (init != true || solved==true || qmade==true){
@@ -97,7 +104,7 @@ public class HiLo implements Guesser<Integer> {
     if(min<0 || max<0){
       x=(int)((long)min + (long)max)/2;
     }
-    String question=String.format("Is your number greater than or equal to %d",x);
+    String question=String.format("Is your number larger than %d",x);
     return question;
   }
   /**
@@ -125,9 +132,14 @@ public class HiLo implements Guesser<Integer> {
     this.min=x;
   }
   /**
-   *progress method
-   *Measures progress my number of items remaining over
-   *the total number of items.
+   *Indicates progress towards solving the problem. After initialization, the
+   *value returned is 0 (unless the problem is immediately solved, in which case
+   *it is 1). It always increases as the guessing process progresses. It is
+   *exactly 1 after the problem is solved.
+   *<p>
+   *This implementation measures progress by number of items remaining over
+   *the total number of items. Which will cause the growth of progress to
+   *exponentally decay as the amount of items decrease
    */
   public double progress(){
     //scaling of progress is a bit off because it uses remaining/total
