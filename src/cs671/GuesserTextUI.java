@@ -5,7 +5,12 @@ import java.io.*;
 import java.util.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/
 /**
-   GuesserTextUI Class
+ * simple, text-based user interface for guessing games. This interface is
+ * constructed from a Guesser object and offers a play method. This method is
+ * blocking (i.e., it does not return until the user is done playing) and
+ * returns the number of games played. 
+ *This class also implements a command-line program to start a HiLo or a Liar
+ *guessing session
  */
 public class GuesserTextUI {
   //I'm lazy and this makes printing things eaiser
