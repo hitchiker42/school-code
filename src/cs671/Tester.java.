@@ -1,3 +1,4 @@
+//Main Thing to work is implimenting Annotation stuff
 package cs671;
 import java.lang.reflect.*;
 import java.util.*;
@@ -6,22 +7,25 @@ import java.io.*;
 //@Test is for methods
 
 /**
- *Tester Class
+ *Test runner. Instances of this class are used to run the tests
+ *methods found in classes that implement Testable.
+ *@author Tucker DiNapoli using api by Michel Charpentier
  */
 public class Tester implements Runnable{
-  //for my convience
+  ArrayList<Class<? extends Testable>> classes;
   PrintWriter output=new PrintWriter(new OutputStreamWriter(System.err),true);
-  void println(String text){
+  //macro for my convience
+  private static void println(String text){
     System.out.println(text);
   }
   /**
-   *Varagargs Tester Constructor
+   *Creates a tester for the given classes
    */
   @SafeVarargs
   public Tester(Class<? extends Testable>...classes){
   }
   /**
-   *Collection Tester Constructor
+   *Creates a tester for the given classes
    */
   public Tester(Collection<Class<? extends Testable>> classes){
   }
@@ -30,6 +34,7 @@ public class Tester implements Runnable{
    *Sets the tester output. By default, the output is System.err.
    * It is valid to set the output to null,
    * in which case the tester is completely silent.
+   *@param w - the output for the tester info; can be null
    */
   public void setPrintWriter(PrintWriter W){
     output=W;
@@ -50,31 +55,55 @@ public class Tester implements Runnable{
    *if they are annotated, even when they are non-public or non-void.
    *Static method and methods that require arguments are ignored.
    *A warning is displayed if they are test-annotated.
+   *@throws IllegalStateException - if this tester has already been run
    */
   public void run(){
     //ArrayList<Class> classes;//define somewhere else
     //foo.getAnnotation(Test.class)
     //for now say foo is a class object to run tests for
-    ArrayDeque<Method> functs;
+    ArrayList<Method> functs;
+    ArrayList<Class> annotations;
     for (i : foo.getMethods()){
-      if(i.getAnnotation(Test.class)!=true){
+      //put these tests in constructor?
+      if(i.isAnnotationPresent(Test.class)!=true){
         continue;
       } else if (i.getParameterTypes() !=0){
         output.println(String.format("Warning method %s is annotated with @Test but takes parameters",i.toString()));
         continue;
       } else if (isStatic(i.getModifiers())){
-        output.println(String.format("Waring static meth %s is annotated with @Test",i.toString()));
+        output.println(String.format("Waring static method %s is annotated with @Test",i.toString()));
         continue;
       } else {
-        functs.addLast(i);
+        functs.add(i);
+        annotations.add(i.getAnnotation(Test.class):
       }
     }
     try {
-      Object temp=foo.newInstance()
+      Object temp=foo.newInstance();
+      Method funct;
+      boolean check;
+      ListIterator iter=functs.listIterator(functs.size()-1);
+      while (iter.hasPrevious()){
+        funct=iter.previous();
+        //consider making into multiple try/catch blocks
+        try{
+          //Do something with annotation
+          check=temp.beforeMethod(funct);
+          if (check==false){
+            throw Exception;
+          }
+        } catch (Exception){
+          output.printLine(String.format("Warning:Before Method for method %s has failed",funct.toString()));
+        }
+        try{
+          funct.invoke(temp);
+          temp.afterMethod(funct);
+        } catch(Exception){output.printLine(String.format("Warning:After Method for method %s has failed",funct.toString()));
+        }
+      }
     } catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
       output.println(String.format("Error Could not instantiate %s",foo.toString()));
-    }//is there even anything to catch?
-    
+    }
   }
   /**
    *get Results Method
@@ -84,8 +113,9 @@ public class Tester implements Runnable{
    *The returned list can be modified and modifications will
    *affect subsequent calls to getResults (i.e., this method
    *does not make copies of the list).
+   *@throws IllegalStateException - if the tester has not yet been run
    */
-  public List<TestRusult> getResults(){
+  public List<TestResult> getResults(){
   }
   /**
    *Main Method
@@ -97,6 +127,13 @@ public class Tester implements Runnable{
   public static void main(String[] args){
     //parse arguments and put into some kind of structure
     //test arguments to see if class exists & if they are testable
-    //
+    //what are formats of Arguments/how do we get classes?
+
+    //this is just a rough outline
+    Tester testRun=new Tester(classes);
+    List<TestRusult> results;
+    testRun.run();
+    testRun.getResults();
+    return;
   }
 }
