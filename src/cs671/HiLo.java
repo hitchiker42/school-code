@@ -1,6 +1,7 @@
 package cs671;
 /**
-   HiLo Class
+ *HiLo Class
+ *@author Tucker DiNapoli from api by Michel Charpentier
  */
 public class HiLo implements Guesser<Integer> {
   //min max and number to ask, min & max are changeable over
@@ -16,7 +17,7 @@ public class HiLo implements Guesser<Integer> {
    *Really simple class to hold the minimum and maximum values
    *over multiple games.
    */
-  static class Range {
+  private static class Range {
     static int min;
     static int max;
     Range(int min,int max){
@@ -44,6 +45,7 @@ public class HiLo implements Guesser<Integer> {
     if (solved != true){
       throw new IllegalStateException() ;
     }
+    solved=false;
     return x;
   }
   /**
@@ -80,11 +82,14 @@ public class HiLo implements Guesser<Integer> {
     }
     qmade=true;
     x=((min + max)/2+(min + max)%2); //rounds up
+    if(min<0 || max<0){
+      x=(min + max)/2;
+    }
     String question=String.format("Is your number greater than or equal to %d",x);
     return question;
   }
   /**
-   *no method
+   *{@inheritDoc}
    */
   public void no(){
     if (init!=true || qmade!=true){
@@ -92,9 +97,13 @@ public class HiLo implements Guesser<Integer> {
     }
     qmade=false;
     this.max=(x-1);
+    //negitive numbers only
+    if (Math.abs(max)>Math.abs(range.min)){
+      max=range.min;
+    }
   }
   /**
-   *yes Method
+   *{@inheritDoc}
    */
   public void yes(){
     if (init!=true || qmade!=true){
