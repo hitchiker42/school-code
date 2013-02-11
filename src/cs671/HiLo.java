@@ -39,7 +39,7 @@ public class HiLo implements Guesser<Integer> {
    *@param min - the lower bound of the range
    *@param max - the upper bounh of the range
    *@throws IllegalArgumentException - if the specified range is empty, i.e.,
-   * min> max 
+   * min> max
    */
   public HiLo(int min,int max){
     if (min>max){
@@ -50,7 +50,6 @@ public class HiLo implements Guesser<Integer> {
     range= new Range(min,max);
     this.x=(int)((long)min+(long)max)/2;
     this.total=(double)((long)max-(long)min);
-    //if (min==Integer.MIN_VALUE
   }
   /**
    *{@inheritDoc}
@@ -117,7 +116,7 @@ public class HiLo implements Guesser<Integer> {
     qmade=false;
     this.max=(x-1);
     //negitive numbers only
-    if (Math.abs(max)>Math.abs(range.min)){
+    if (Math.abs(max)>Math.abs(range.min) && max<0){
       max=range.min;
     }
   }
