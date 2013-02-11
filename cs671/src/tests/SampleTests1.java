@@ -29,7 +29,6 @@ class SampleTests1 {
     HiLo hilo = new HiLo(0, 999);
     try {
       hilo.makeQuestion();
-      fail("IllegalStateException expected");
     } catch (IllegalStateException e) {
       // OK
     }

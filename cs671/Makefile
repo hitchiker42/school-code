@@ -1,5 +1,6 @@
 SOURCES := $(wildcard src/cs671/*.java src/cs671/*/*.java)
 JAVAC ?= javac
+CLASSPATH ?=$PWD:$PWD/src/grader.jar
 ifeq ($(JAVAC),gcj)
 	override JAVAC_FLAGS += --main=cs671.GuesserTextUI -o guesser 
 	DEBUG := -Wall
@@ -8,8 +9,7 @@ else
 	DEBUG := -Xlint
 endif
 .PHONY: clean all 1 2 3 4
-all: cs671
-# html tests
+all: cs671  tests
 debug: JAVAC_FLAGS += $(DEBUG)
 debug:cs671
 cs671: $(SOURCES)
@@ -17,7 +17,7 @@ cs671: $(SOURCES)
 #@touch cs671
 tests: cs671 src/tests/*.java
 	$(JAVAC) $(JAVAC_FLAGS) src/tests/*.java
-	@touch tests
+#	@touch tests
 html: $(SOURCES)
 	javadoc @javadoc-options $^
 #	@touch html
