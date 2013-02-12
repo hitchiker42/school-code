@@ -71,35 +71,44 @@ public class Tester implements Runnable{
           if(!i.isAnnotationPresent(Test.class)){
             continue;}
           else if (i.getParameterTypes() !=0){
-            output.println(String.format("Warning method %s is annotated with @Test but takes parameters",i.toString()));
+            output.println(String.format("Warning method %s is annotated with "
+                                         +"@Test but takes parameters",i.toString()));
             continue;}
           else if (isStatic(i.getModifiers())){
-            output.println(String.format("Waring static method %s is annotated with @Test",i.toString()));
+            output.println(String.format("Waring static method %s is annotated with "
+                                         +"@Test",i.toString()));
             continue;}
           else {
             //need to cut logical line into multiple physical lines
             Class annotate=i.getAnnotations();
             Field[] fields=annotate.getFields();
-            tests.add(new Testpkg(i,fields[0].getDouble(weight),fields[1].get(info).toString()))}}
+            tests.add(new Testpkg(i,fields[0].getDouble(weight),
+                                  fields[1].get(info).toString()))}}
       try {
         Object temp=foo.newInstance();
-        Method funct;
+        Testpkg testpkg;
         boolean check;
-        ListIterator iter=functs.listIterator(functs.size()-1);
+        ListIterator iter=tests.listIterator(tests.size()-1);
         while (iter.hasPrevious()){
-          funct=iter.previous();
+          testpkg=iter.previous();
           //consider making into multiple try/catch blocks
           try{
             //Do something with annotation
-            check=temp.beforeMethod(funct);
-            if (check==false){
-              throw Exception;}}
-          catch (Exception){
-            output.printLine(String.format("Warning:Before Method for method %s has failed",funct.toString()));}
+            if 
+              check=temp.beforeMethod(testpkg.method);
+            if (!check){
+              throw new Exception;}}
+          catch (Exception ex){
+            output.printLine(String.format("Warning:Before Method for method %s"
+                                           +" has failed",funct.toString()));}
           try{
             funct.invoke(temp);
             temp.afterMethod(funct);}
-          catch(Exception){output.printLine(String.format("Warning:After Method for method %s has failed",funct.toString()));}}}
+          //break logical line
+          catch(Exception ex){output.printLine(String.format("Warning:After Method for"
+                                                             +" method %s has failed",
+                                                             funct.toString()));}}}
+      //need to fix syntax
       catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
         output.println(String.format("Error Could not instantiate %s",foo.toString()));}}}}
   /**
