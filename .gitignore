@@ -43,13 +43,13 @@ Thumbs.db
 # Autotools #
 ######################
 Makefile.in
-/autom4te.cache
-/aclocal.m4
-/compile
-/configure
-/depcomp
-/install-sh
-/missing
+{iam751}/autom4te.cache
+{iam751}/aclocal.m4
+{iam751}/compile
+{iam751}/configure
+{iam751}/depcomp
+{iam751}/install-sh
+{iam751}/missing
 
 # Emacs  #
 ######################
