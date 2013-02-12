@@ -1,4 +1,5 @@
 //Main Thing to work is implimenting Annotation stuff
+//Trying Lisp-esq syntax for closing braces
 package cs671;
 import java.lang.reflect.*;
 import java.util.*;
@@ -15,9 +16,7 @@ public class Tester implements Runnable{
   ArrayList<Class<? extends Testable>> classes;
   PrintWriter output=new PrintWriter(new OutputStreamWriter(System.err),true);
   //macro for my convience
-  private static void println(String text){
-    System.out.println(text);
-  }
+  private static void println(String text){System.out.println(text);}
   /**
    *Creates a tester for the given classes
    */
@@ -36,9 +35,7 @@ public class Tester implements Runnable{
    * in which case the tester is completely silent.
    *@param w - the output for the tester info; can be null
    */
-  public void setPrintWriter(PrintWriter W){
-    output=W;
-  }
+  public void setPrintWriter(PrintWriter W){output=W;}
   //need to revise to fit my implimentation
   /**
    *Run Method
@@ -58,53 +55,62 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if this tester has already been run
    */
   public void run(){
-    //ArrayList<Class> classes;//define somewhere else
-    //foo.getAnnotation(Test.class)
-    //for now say foo is a class object to run tests for
-    ArrayList<Method> functs;
-    ArrayList<Class> annotations;
-    for (i : foo.getMethods()){
-      //put these tests in constructor?
-      if(i.isAnnotationPresent(Test.class)!=true){
-        continue;
-      } else if (i.getParameterTypes() !=0){
-        output.println(String.format("Warning method %s is annotated with @Test but takes parameters",i.toString()));
-        continue;
-      } else if (isStatic(i.getModifiers())){
-        output.println(String.format("Waring static method %s is annotated with @Test",i.toString()));
-        continue;
-      } else {
-        functs.add(i);
-        annotations.add(i.getAnnotation(Test.class):
-      }
-    }
-    try {
-      Object temp=foo.newInstance();
-      Method funct;
-      boolean check;
-      ListIterator iter=functs.listIterator(functs.size()-1);
-      while (iter.hasPrevious()){
-        funct=iter.previous();
-        //consider making into multiple try/catch blocks
-        try{
-          //Do something with annotation
-          check=temp.beforeMethod(funct);
-          if (check==false){
-            throw Exception;
-          }
-        } catch (Exception){
-          output.printLine(String.format("Warning:Before Method for method %s has failed",funct.toString()));
-        }
-        try{
-          funct.invoke(temp);
-          temp.afterMethod(funct);
-        } catch(Exception){output.printLine(String.format("Warning:After Method for method %s has failed",funct.toString()));
-        }
-      }
-    } catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
-      output.println(String.format("Error Could not instantiate %s",foo.toString()));
-    }
-  }
+    private class Testpkg{
+      Method method;
+      double weight;
+      boolean passed;
+      String info;
+      Testpkg(Method method,double weight,String info){
+        this.method=method;this.weight=weight;this.info=info;}}
+    ArrayList<Testpkg> tests;
+    for(foo : classes){
+      //do we need this test?
+      if(foo.isAnnotationPresent(Testable.class)){
+        for (i : foo.getMethods()){
+          //put these tests in constructor?
+          if(!i.isAnnotationPresent(Test.class)){
+            continue;}
+          else if (i.getParameterTypes() !=0){
+            output.println(String.format("Warning method %s is annotated with "
+                                         +"@Test but takes parameters",i.toString()));
+            continue;}
+          else if (isStatic(i.getModifiers())){
+            output.println(String.format("Waring static method %s is annotated with "
+                                         +"@Test",i.toString()));
+            continue;}
+          else {
+            //need to cut logical line into multiple physical lines
+            Class annotate=i.getAnnotations();
+            Field[] fields=annotate.getFields();
+            tests.add(new Testpkg(i,fields[0].getDouble(weight),
+                                  fields[1].get(info).toString()))}}
+      try {
+        Object temp=foo.newInstance();
+        Testpkg testpkg;
+        boolean check;
+        ListIterator iter=tests.listIterator(tests.size()-1);
+        while (iter.hasPrevious()){
+          testpkg=iter.previous();
+          //consider making into multiple try/catch blocks
+          try{
+            //Do something with annotation
+            if 
+              check=temp.beforeMethod(testpkg.method);
+            if (!check){
+              throw new Exception;}}
+          catch (Exception ex){
+            output.printLine(String.format("Warning:Before Method for method %s"
+                                           +" has failed",funct.toString()));}
+          try{
+            funct.invoke(temp);
+            temp.afterMethod(funct);}
+          //break logical line
+          catch(Exception ex){output.printLine(String.format("Warning:After Method for"
+                                                             +" method %s has failed",
+                                                             funct.toString()));}}}
+      //need to fix syntax
+      catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
+        output.println(String.format("Error Could not instantiate %s",foo.toString()));}}}}
   /**
    *get Results Method
    *Test results. This method returns a list that contains
@@ -134,6 +140,4 @@ public class Tester implements Runnable{
     List<TestRusult> results;
     testRun.run();
     testRun.getResults();
-    return;
-  }
-}
+    return;}}
