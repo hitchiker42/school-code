@@ -10,11 +10,11 @@ int main(int argv,char** args){
   //Argparse stuff
   int c;
   int result;
-  file output:
+  //  file output:
   opterr = 0;
-  while ((c = getopt (argv, args, "asmhf:")) != -1){
+  while ((c = getopt (argv, args, "asmh/*f:*/")) != -1){
     switch(c) {
-    case 'f':
+      //case 'f':
       //umm..remember how to do output
     case 'a':
       result=add_test(argv,args);
