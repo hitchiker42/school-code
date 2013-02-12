@@ -173,7 +173,7 @@ public class GuesserTextUI {
             candidates.add(word);
             word=fileRead.readLine();
           }
-          Liar liar=new Liar<>(candidates,lies,name);
+          Liar<String> liar=new Liar<>(candidates,lies,name);
           try{
             int n=liar.selectCandidates(new Integer(args[4]));
             if(n<0){

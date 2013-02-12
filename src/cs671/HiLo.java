@@ -116,8 +116,8 @@ public class HiLo implements Guesser<Integer> {
     qmade=false;
     this.max=(x-1);
     //negitive numbers only
-    if (Math.abs(max)>Math.abs(range.min) && max<0){
-      max=range.min;
+    if (Math.abs(max)>Math.abs(Range.min) && max<0){
+      max=Range.min;
     }
   }
   /**
