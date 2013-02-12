@@ -22,6 +22,10 @@ public class Tester implements Runnable{
    */
   @SafeVarargs
   public Tester(Class<? extends Testable>...classes){
+    //to test if Class is testable
+    for (i : classes){
+      assert(Testable.class.isAssignableFrom(i));}
+    //maybe
   }
   /**
    *Creates a tester for the given classes
@@ -36,7 +40,7 @@ public class Tester implements Runnable{
    *@param w - the output for the tester info; can be null
    */
   public void setPrintWriter(PrintWriter W){output=W;}
-  //need to revise to fit my implimentation
+  //need to revise comment to fit my implimentation
   /**
    *Run Method
    *Runs the tests. All the classes are processed in the order in which
@@ -55,62 +59,83 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if this tester has already been run
    */
   public void run(){
-    private class Testpkg{
-      Method method;
-      double weight;
-      boolean passed;
-      String info;
+    /**
+     *Class Testpkg
+     */
+    private class Testpkg implements TestResult{
+      //initalized in constructor
+      Method method;double weight;String info;
+      //initalized later
+      boolean success;double duration;
+      Object returned;Throwable error;
+      /**
+       *Testpkg Constructor
+       */
       Testpkg(Method method,double weight,String info){
-        this.method=method;this.weight=weight;this.info=info;}}
-    ArrayList<Testpkg> tests;
-    for(foo : classes){
+        this.method=method;this.weight=weight;this.info=info;}
+      double getWeight(){return weight;}
+      boolean success(){return success;}
+      String getInfo(){return info;}
+      double getDuration(){return duration;}
+      Throwable error(){return error;}}
+    ArrayList<Testpkg> tests=new ArrayList<Testpkg>;
+    for(Class foo : classes){
       //do we need this test?
       if(foo.isAnnotationPresent(Testable.class)){
-        for (i : foo.getMethods()){
+        for (Method i : foo.getDeclaredMethods()){
           //put these tests in constructor?
           if(!i.isAnnotationPresent(Test.class)){
             continue;}
           else if (i.getParameterTypes() !=0){
             output.println(String.format("Warning method %s is annotated with "
-                                         +"@Test but takes parameters",i.toString()));
+                                         +"@Test but takes parameters",
+                                         i.toString()));
             continue;}
           else if (isStatic(i.getModifiers())){
-            output.println(String.format("Waring static method %s is annotated with "
-                                         +"@Test",i.toString()));
+            output.println(String.format("Waring static method %s is annotated"
+                                         +" with @Test",i.toString()));
             continue;}
           else {
-            //need to cut logical line into multiple physical lines
-            Class annotate=i.getAnnotations();
-            Field[] fields=annotate.getFields();
-            tests.add(new Testpkg(i,fields[0].getDouble(weight),
-                                  fields[1].get(info).toString()))}}
-      try {
-        Object temp=foo.newInstance();
-        Testpkg testpkg;
-        boolean check;
-        ListIterator iter=tests.listIterator(tests.size()-1);
-        while (iter.hasPrevious()){
-          testpkg=iter.previous();
-          //consider making into multiple try/catch blocks
+            try{
+              Class annotate=i.getAnnotations(Test.class);
+              ArrayList<Field> fields=new
+                ArrayList<Field>(Arrays.asList(annotate.getDeclaredFields()));
+              assert(fields.contains(weight));
+              assert(fields.contains(info));
+              tests.add(new Testpkg(i,fields.get(0).getDouble(weight),
+                                    (String)fields.get(1).get(info)))}
+            catch(IllegalAccessException | IllegalArgumentException |
+                  NullPointerException | CastClassException ex){
+            }}}
+        try {
+          Object temp=foo.newInstance();Testpkg testpkg;boolean check;
+          for(testpkg : foo)
+            if(testpkg.weight <=0){continue;}
           try{
-            //Do something with annotation
-            if 
-              check=temp.beforeMethod(testpkg.method);
+            check=temp.beforeMethod(testpkg.method);
             if (!check){
               throw new Exception;}}
           catch (Exception ex){
-            output.printLine(String.format("Warning:Before Method for method %s"
-                                           +" has failed",funct.toString()));}
+            output.printLine(String.format("Warning:Before Method for method"
+                                           +" %s has failed",
+                                           funct.toString()));}
           try{
-            funct.invoke(temp);
+            testpkg.duration=(double)System.nanoTime;
+            testpkg.method.invoke(temp);
+            teskpkg.duration=testpkg.duration-(double)System.nanoTime;}
+          catch(Object<? implements Throwable> ex){
+            testpkg.duration=testpkg.duration-(double)System.nanoTime;
+            testpkg.error=ex;}
+          try{
             temp.afterMethod(funct);}
-          //break logical line
-          catch(Exception ex){output.printLine(String.format("Warning:After Method for"
-                                                             +" method %s has failed",
-                                                             funct.toString()));}}}
-      //need to fix syntax
-      catch(InstantiationException | IllegalAccessException | ExceptionInInitalizerError){
-        output.println(String.format("Error Could not instantiate %s",foo.toString()));}}}}
+          catch(Exception ex){
+            output.printLine(String.format("Warning:After Method for"
+                                           +" method %s has failed",
+                                           funct.toString()));}}
+        catch(InstantiationException | IllegalAccessException |
+              ExceptionInInitalizerError ex){
+          output.println(String.format("Error Could not instantiate %s",
+                                       foo.toString()));}}}}}
   /**
    *get Results Method
    *Test results. This method returns a list that contains
@@ -131,9 +156,8 @@ public class Tester implements Runnable{
    *of tests that succeeded and tests that failed.
    */
   public static void main(String[] args){
-    //parse arguments and put into some kind of structure
-    //test arguments to see if class exists & if they are testable
-    //what are formats of Arguments/how do we get classes?
+    //Get list of classes to test, check if they exist 
+    //& print output to stdout
 
     //this is just a rough outline
     Tester testRun=new Tester(classes);
