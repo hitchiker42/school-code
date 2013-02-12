@@ -1,6 +1,6 @@
 //Main Thing to work is implimenting Annotation stuff
 //Trying Lisp-esq syntax for closing braces
-package cs671;
+package testable;
 import java.lang.reflect.*;
 import java.util.*;
 import java.io.*;
@@ -188,9 +188,9 @@ public class Tester implements Runnable{
     for (String i : args){
       try{
         temp=loader.loadClass(i);
-        temp=temp.asSubclass(Testable.class);}
-      catch(ClassCastException ex){
-        println("Class does not implement Testable");}
+        if (Testable.class.isAssignableFrom(temp)){
+          //if ^ that passes than v that cast is ok
+          classes.add((Class<? extends Testable>)temp);}}
       catch(ClassNotFoundException ex){
         println("Class "+i+" not found");}}
     if (classes == null){

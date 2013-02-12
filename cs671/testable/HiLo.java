@@ -1,4 +1,5 @@
-package cs671;
+package testable;
+import java.lang.reflect.*;
 /**
  *A simple guessing game. This game illustrates the Guesser interface. The user
  *picks a number between a specified minimum and maximum and the guesser will
@@ -7,9 +8,11 @@ package cs671;
  *question. After it's found, the number is returned as an instance of Integer. 
  *@author Tucker DiNapoli from api by Michel Charpentier
  */
-public class HiLo implements Guesser<Integer> {
+public class HiLo implements Guesser<Integer>, Testable{
   //min max and number to ask, min & max are changeable over
   //each game
+  public boolean beforeMethod(Method m){return true;}
+  public void afterMethod(Method m){}
   private int min,max,x;
   double total;
   Range range;
@@ -54,6 +57,7 @@ public class HiLo implements Guesser<Integer> {
   /**
    *{@inheritDoc}
    */
+  @Test
   public Integer getSecret(){
     if (solved != true){
       throw new IllegalStateException() ;
@@ -64,6 +68,7 @@ public class HiLo implements Guesser<Integer> {
   /**
    *{@inheritDoc}
    */
+  @Test
   public boolean hasSolved(){
     if (init!=true){
       throw new IllegalStateException();
@@ -83,6 +88,7 @@ public class HiLo implements Guesser<Integer> {
    *@return the string "Pick a number between X and Y", where X is the minimum
    *and Y is the maximum, as specified when the instance was constructed 
    */
+  @Test
   public String initialize(){
     max=Range.max;
     min=Range.min;
@@ -109,6 +115,7 @@ public class HiLo implements Guesser<Integer> {
   /**
    *{@inheritDoc}
    */
+  @Test
   public void no(){
     if (init!=true || qmade!=true){
       throw new IllegalStateException();
@@ -123,6 +130,7 @@ public class HiLo implements Guesser<Integer> {
   /**
    *{@inheritDoc}
    */
+  @Test
   public void yes(){
     if (init!=true || qmade!=true){
       throw new IllegalStateException();
@@ -140,6 +148,7 @@ public class HiLo implements Guesser<Integer> {
    *the total number of items. Which will cause the growth of progress to
    *exponentally decay as the amount of items decrease
    */
+  @Test
   public double progress(){
     //scaling of progress is a bit off because it uses remaining/total
     //but it works and so thats the way I'm leaving it.

@@ -1,6 +1,6 @@
 //For the guesser, might need to use g, and might need to call initalizer while parsing
 //command line arguements
-package cs671;
+package testable;
 import java.io.*;
 import java.util.*;//For now, but simplify to only classes I need
 /*Main Text Interfact to guesser program*/

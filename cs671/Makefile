@@ -1,4 +1,6 @@
 SOURCES := $(wildcard src/cs671/*.java src/cs671/*/*.java)
+#SOURCES1=something
+SOURCES2 := $(wildcard src/cs671/Test*.java)
 JAVAC ?= javac
 CLASSPATH ?=$PWD:$PWD/src/grader.jar
 ifeq ($(JAVAC),gcj)
@@ -9,18 +11,16 @@ else
 	DEBUG := -Xlint
 endif
 .PHONY: clean all 1 2 3 4
-all: cs671  tests
+all:cs671
+check:cs671 tests
 debug: JAVAC_FLAGS += $(DEBUG)
 debug:cs671
 cs671: $(SOURCES)
 	$(JAVAC) $(JAVAC_FLAGS) $^
-#@touch cs671
 tests: cs671 src/tests/*.java
 	$(JAVAC) $(JAVAC_FLAGS) src/tests/*.java
-#	@touch tests
 html: $(SOURCES)
 	javadoc @javadoc-options $^
-#	@touch html
 clean:
 	/bin/rm -rf cs671 html tests
 doc: html
@@ -31,3 +31,5 @@ doc: html
 # 1: $(SOURCES1)
 #	$(JAVAC) $?
 1: cs671
+2: $(SOURCES2)
+	$(JAVAC) $(JAVAC_FLAGS) $^
