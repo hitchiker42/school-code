@@ -1,5 +1,4 @@
 //Main Thing to work is implimenting Annotation stuff
-//Trying Lisp-esq syntax for closing braces
 package cs671;
 import java.lang.reflect.*;
 import java.util.*;
@@ -14,11 +13,10 @@ import java.io.*;
  */
 public class Tester implements Runnable{
   boolean hasrun=false;
-  static ArrayList<Class<? extends Testable>> classes;
-  //static ArrayList<Class<? extends Testable>> argClasses;
+  ArrayList<Class<? extends Testable>> classes=new ArrayList();
   PrintWriter output=new PrintWriter(new OutputStreamWriter(System.err),true);
   //macro for my convience
-  private static void println(String text){System.out.println(text);}
+  private static void println(Object text){System.err.println(text);}
   /**
    *Creates a tester for the given classes
    */
@@ -27,17 +25,18 @@ public class Tester implements Runnable{
     //to test if Class is testable
     for (Class<? extends Testable> i : classes){
       assert(Testable.class.isAssignableFrom(i));
-      Tester.classes.add(i);}
+      this.classes.add(i);
+    }
     //maybe
   }
-  Tester (){}
   /**
    *Creates a tester for the given classes
    */
   public Tester(Collection<Class<? extends Testable>> classes){
     for (Class<? extends Testable> i : classes){
       assert(Testable.class.isAssignableFrom(i));
-      Tester.classes.add(i);}
+      this.classes.add(i);
+    }
   }
   /**
    *SetPrint Writer Method
@@ -48,6 +47,29 @@ public class Tester implements Runnable{
    */
   public void setPrintWriter(PrintWriter W){output=W;}
   //need to revise comment to fit my implimentation
+
+    /**
+     *Class Testpkg
+     */
+    class Testpkg implements TestResult{
+      //initalized in constructor
+      Method method;double weight;String info;
+      //initalized later
+      boolean success;double duration;
+      Object returned;Throwable error;
+      /**
+       *Testpkg Constructor
+       */
+      Testpkg(Method method,double weight,String info){
+        this.method=method;this.weight=weight;this.info=info;
+      }
+      public double getWeight(){return weight;}
+      public boolean success(){return success;}
+      public String getInfo(){return info;}
+      public double getDuration(){return duration;}
+      public Throwable error(){return error;}
+    }
+  ArrayList<ArrayList<Testpkg>> classTests=new ArrayList<>();
   /**
    *Run Method
    *Runs the tests. All the classes are processed in the order in which
@@ -66,98 +88,104 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if this tester has already been run
    */
   public void run(){
-    /**
-     *Class Testpkg
-     */
-    class Testpkg implements TestResult{
-      //initalized in constructor
-      Method method;double weight;String info;
-      //initalized later
-      boolean success;double duration;
-      Object returned;Throwable error;
-      /**
-       *Testpkg Constructor
-       */
-      Testpkg(Method method,double weight,String info){
-        this.method=method;this.weight=weight;this.info=info;}
-      public double getWeight(){return weight;}
-      public boolean success(){return success;}
-      public String getInfo(){return info;}
-      public double getDuration(){return duration;}
-      public Throwable error(){return error;}}
-
-    ArrayList<ArrayList<Testpkg>> classTests=new ArrayList<>();
+    int count=0;
     for(Class<? extends Testable> foo : classes){
+      //println("Class:\n"+"To String: "
+      //        +foo.toString()+"\n"+"Name: "+foo.getName());
       ArrayList<Testpkg> tests=new ArrayList<Testpkg>();
+      Testable temp;
       //do we need this test?(test if class is testable)
       for (Method meth : foo.getDeclaredMethods()){
+        //println("Method:\n"+"To String: "+meth.toString()
+        //        +"\n"+"Name: "+meth.getName());
         try{
-          meth.setAccessible(true);}
-        catch(SecurityException ex){
-          output.println("Security prevents you from running your tests.");}
-        Testable temp;
+          meth.setAccessible(true);
+        } catch(SecurityException ex){
+          output.println("Security prevents you from running your tests.");
+        }
         //put these tests in constructor?(test if method is annotated w/test)
         if(!meth.isAnnotationPresent(Test.class)){
-          continue;}
+          continue;
+        }
         else if (meth.getParameterTypes().length !=0){
           //test if method takes parameters
+          println("Parameter Types:"+meth.getParameterTypes().toString());
           output.println(String.format("Warning method %s is annotated with "
                                        +"@Test but takes parameters",
                                        meth.toString()));
-          continue;}
+          continue;
+        }
         else if (Modifier.isStatic(meth.getModifiers())){
           //test if method is static
           output.println(String.format("Waring static method %s is annotated"
                                        +" with @Test",meth.toString()));
-          continue;}
+          continue;
+        }
         //method is ok, moving on
+        else{
+          try{//try to get annotation parameters(do we need this?)
+            Test annotate=meth.getAnnotation(Test.class);
+            //also how to deal with this ?
+            Field[] access=meth.getClass().getDeclaredFields();
+            AccessibleObject.setAccessible(access,true);
+            ArrayList<Field> fields=new ArrayList<Field>(Arrays.asList(access));
+            assert(fields.contains(annotate.weight()));
+            assert(fields.contains(annotate.info()));
+            tests.add(new Testpkg(meth,fields.get(0).
+                                  getDouble(annotate.weight()),
+                                  (String)fields.get(1).
+                                  get(annotate.info())));
+          }
+          catch(IllegalAccessException | IllegalArgumentException
+                | NullPointerException | ClassCastException ex){
+            output.println("Error: "+ex.toString()+" raised");
+          }
+        }
+      }
+      for(Testpkg testpkg : tests){
         try {//try to instancate object
+          println("Testing");
           //Constructor cons=foo.getConstructor();
-          temp=(Testable)foo.newInstance();}
+          temp=(Testable)foo.newInstance();
+        }
         catch(InstantiationException | IllegalAccessException
               | LinkageError ex){
           output.println(String.format("Error Could not instantiate %s",
                                        foo.toString()));
           break;}
-        try{//try to get annotation parameters(do we need this?)
-          Test annotate=meth.getAnnotation(Test.class);
-          //also how to deal with this ?
-          ArrayList<Field> fields=new
-            ArrayList<Field> (Arrays.asList
-                              (meth.getClass().getDeclaredFields()));
-          assert(fields.contains(annotate.weight()));
-          assert(fields.contains(annotate.info()));
-          tests.add(new Testpkg(meth,fields.get(0).getDouble(annotate.weight()),
-                                (String)fields.get(1).get(annotate.info())));}
-        catch(IllegalAccessException | IllegalArgumentException
-              | NullPointerException | ClassCastException ex){
+        if(testpkg.weight <=0){continue;}
+        try{//invoke beforeMethod
+          boolean check=temp.beforeMethod(testpkg.method);
+          if (!check){
+            throw new Exception();}}
+        catch (Exception ex){
+          output.println(String.format("Warning:Before Method for method"
+                                       +" %s has failed",
+                                       testpkg.method.toString()));
+          continue;}
+        try{//invoke method
+          testpkg.duration=(double)System.nanoTime();
+          testpkg.method.invoke(temp);
+          testpkg.duration=testpkg.duration-(double)System.nanoTime();
+          println("Method executed.");
+        } catch(Throwable ex){
+          testpkg.duration=testpkg.duration-(double)System.nanoTime();
+          testpkg.error=ex;
         }
-        for(Testpkg testpkg : tests){
-          if(testpkg.weight <=0){continue;}
-          try{//invoke beforeMethod
-            boolean check=temp.beforeMethod(testpkg.method);
-            if (!check){
-              throw new Exception();}}
-          catch (Exception ex){
-            output.println(String.format("Warning:Before Method for method"
-                                           +" %s has failed",
-                                           testpkg.method.toString()));
-            continue;}
-          try{//invoke method
-            testpkg.duration=(double)System.nanoTime();
-            testpkg.method.invoke(temp);
-            testpkg.duration=testpkg.duration-(double)System.nanoTime();}
-          catch(Throwable ex){
-            testpkg.duration=testpkg.duration-(double)System.nanoTime();
-            testpkg.error=ex;}
-          try{//invoke afterMethod
-            temp.afterMethod(testpkg.method);}
-          catch(Exception ex){
-            output.println(String.format("Warning:After Method for"
-                                         +" method %s has failed",
-                                         testpkg.method.toString()));}}}
-      classTests.add(tests);}
-    hasrun=true;}
+        try{//invoke afterMethod
+          temp.afterMethod(testpkg.method);
+        } catch(Exception ex){
+          output.println(String.format("Warning:After Method for"
+                                       +" method %s has failed",
+                                       testpkg.method.toString()));
+        }
+        count++;
+        println(count);
+      }//end of for i : method loop
+      classTests.add(tests);
+    }
+    hasrun=true;
+  }
   /**
    *get Results Method
    *Test results. This method returns a list that contains
@@ -170,9 +198,9 @@ public class Tester implements Runnable{
    */
   public List<TestResult> getResults(){
     ArrayList<Testpkg> results=new ArrayList<Testpkg>();
-    for (ArrayList<Testpkg>i : classTests){
+    for (ArrayList<Testpkg> i : classTests){
       results.addAll(i);}
-    return results;
+    return (List)results;
   }
   /**
    *Main Method
@@ -182,25 +210,48 @@ public class Tester implements Runnable{
    *of tests that succeeded and tests that failed.
    */
   public static void main(String[] args){
-    //Need to see if Classes are Testable
+    ArrayList<Class<? extends Testable>> argClasses=new ArrayList();
     if (args.length<=0 || args[0]=="-h" || args[0]=="--help"){
       println("Call with one or more names of testable classes");
-      return;}
+      return;
+    }
     ClassLoader loader=ClassLoader.getSystemClassLoader();
-    Class<?> temp;
+    Class<?> temp=null;
+    argClasses.add(Testable.class);
     for (String i : args){
       try{
         temp=loader.loadClass(i);
-        temp=temp.asSubclass(Testable.class);}
-      catch(ClassCastException ex){
-        println("Class does not implement Testable");}
-      catch(ClassNotFoundException ex){
-        println("Class "+i+" not found");}}
-    if (classes == null){
+        argClasses.add(temp.asSubclass(cs671.Testable.class));
+      } catch(ClassCastException ex){
+        println("Class does not implement Testable");
+      } catch(ClassNotFoundException ex){
+        println("Class "+i+" not found");
+      } catch(NullPointerException ex){
+        ex.printStackTrace();
+        println(ex.getMessage());
+        println(String.format("Args: %s\nTemp: %s\nClasses: %s"
+                              ,args.toString(),temp.toString(),
+                              argClasses.toString()));
+      }
+    }
+    if (argClasses == null){
       println("No classes found to test");
-      return;}
-    Tester testRun=new Tester();
+      return;
+    }
+    Tester testRun=new Tester(argClasses);
     List<TestResult> results;
+    println("Running");
     testRun.run();
-    testRun.getResults();
-    return;}}
+    println("Has Run");
+    results=testRun.getResults();
+    for (TestResult i : results){
+      println(i.getWeight());
+      println(i.success());
+      println(i.getInfo());
+      println(i.getDuration());
+      println(i.error());
+    }
+    println("End of Main");
+    return;
+  }
+}
