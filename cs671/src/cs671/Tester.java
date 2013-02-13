@@ -169,7 +169,10 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if the tester has not yet been run
    */
   public List<TestResult> getResults(){
-    return null;
+    ArrayList<Testpkg> results=new ArrayList<Testpkg>();
+    for (ArrayList<Testpkg>i : classTests){
+      results.addAll(i);}
+    return results;
   }
   /**
    *Main Method
