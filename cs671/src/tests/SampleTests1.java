@@ -1,11 +1,14 @@
-// $Id: SampleTests1.java 128 2013-01-23 15:51:16Z cs671a $
+// $Id: SampleTests1.java 133 2013-02-07 16:27:03Z cs671a $
 
 package tests;
 
 import charpov.grader.*;
 import static org.testng.Assert.*;
 
-import cs671.*;
+import cs671.HiLo;
+import cs671.Liar;
+import cs671.GuesserTextUI;
+import cs671.Guesser;
 
 import java.util.Set;
 import charpov.util.Answer;
@@ -16,7 +19,10 @@ class SampleTests1 {
   public static void main (String[] args) throws Exception {
     java.util.logging.Logger.getLogger("charpov.grader")
       .setLevel(java.util.logging.Level.WARNING);
-    new Tester(SampleTests1.class).run();
+    new Tester(SampleTests1.class,
+               TestHiLo.class,
+               TestLiar.class,
+               TestGuesserTextUI.class).run();
   }
 
   @Test void sample1 () {
@@ -29,6 +35,7 @@ class SampleTests1 {
     HiLo hilo = new HiLo(0, 999);
     try {
       hilo.makeQuestion();
+      fail("IllegalStateException expected");
     } catch (IllegalStateException e) {
       // OK
     }

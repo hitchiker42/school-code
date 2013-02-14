@@ -3,6 +3,7 @@ package cs671;
 import java.lang.reflect.*;
 import java.util.*;
 import java.io.*;
+import static cs671.Debug.*;
 //Testable is for classes
 //@Test is for methods
 
@@ -13,7 +14,8 @@ import java.io.*;
  */
 public class Tester implements Runnable{
   boolean hasrun=false;
-  ArrayList<Class<? extends Testable>> classes=new ArrayList();
+  List<TestResult> results=new ArrayList<TestResult>();
+  ArrayList<Class<? extends Testable>> classes=new ArrayList<>();
   PrintWriter output=new PrintWriter(new OutputStreamWriter(System.err),true);
   //macro for my convience
   private static void println(Object text){System.err.println(text);}
@@ -46,8 +48,6 @@ public class Tester implements Runnable{
    *@param w - the output for the tester info; can be null
    */
   public void setPrintWriter(PrintWriter W){output=W;}
-  //need to revise comment to fit my implimentation
-
     /**
      *Class Testpkg
      */
@@ -88,22 +88,17 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if this tester has already been run
    */
   public void run(){
-    int count=0;
     for(Class<? extends Testable> foo : classes){
-      //println("Class:\n"+"To String: "
-      //        +foo.toString()+"\n"+"Name: "+foo.getName());
       ArrayList<Testpkg> tests=new ArrayList<Testpkg>();
       Testable temp;
       //do we need this test?(test if class is testable)
       for (Method meth : foo.getDeclaredMethods()){
-        //println("Method:\n"+"To String: "+meth.toString()
-        //        +"\n"+"Name: "+meth.getName());
         try{
           meth.setAccessible(true);
         } catch(SecurityException ex){
           output.println("Security prevents you from running your tests.");
         }
-        //put these tests in constructor?(test if method is annotated w/test)
+        //test if method is annotated w/test
         if(!meth.isAnnotationPresent(Test.class)){
           continue;
         }
@@ -123,21 +118,18 @@ public class Tester implements Runnable{
         }
         //method is ok, moving on
         else{
-          try{//try to get annotation parameters(do we need this?)
+          try{//try to get annotation parameters
             Test annotate=meth.getAnnotation(Test.class);
-            //also how to deal with this ?
             Field[] access=meth.getClass().getDeclaredFields();
             AccessibleObject.setAccessible(access,true);
             ArrayList<Field> fields=new ArrayList<Field>(Arrays.asList(access));
             assert(fields.contains(annotate.weight()));
             assert(fields.contains(annotate.info()));
-            tests.add(new Testpkg(meth,fields.get(0).
-                                  getDouble(annotate.weight()),
-                                  (String)fields.get(1).
-                                  get(annotate.info())));
+            tests.add(new Testpkg(meth,annotate.weight(),annotate.info()));
           }
-          catch(IllegalAccessException | IllegalArgumentException
-                | NullPointerException | ClassCastException ex){
+          catch(IllegalArgumentException |
+                NullPointerException | ClassCastException ex){
+            trace(ex);
             output.println("Error: "+ex.toString()+" raised");
           }
         }
@@ -150,6 +142,7 @@ public class Tester implements Runnable{
         }
         catch(InstantiationException | IllegalAccessException
               | LinkageError ex){
+          trace(ex);
           output.println(String.format("Error Could not instantiate %s",
                                        foo.toString()));
           break;}
@@ -159,6 +152,7 @@ public class Tester implements Runnable{
           if (!check){
             throw new Exception();}}
         catch (Exception ex){
+          trace(ex);
           output.println(String.format("Warning:Before Method for method"
                                        +" %s has failed",
                                        testpkg.method.toString()));
@@ -166,11 +160,12 @@ public class Tester implements Runnable{
         try{//invoke method
           testpkg.duration=(double)System.nanoTime();
           testpkg.method.invoke(temp);
-          testpkg.duration=testpkg.duration-(double)System.nanoTime();
+          testpkg.duration=(double)System.nanoTime()-testpkg.duration;
           println("Method executed.");
         } catch(Throwable ex){
-          testpkg.duration=testpkg.duration-(double)System.nanoTime();
+          testpkg.duration=(double)System.nanoTime()-testpkg.duration;
           testpkg.error=ex;
+          trace(ex);
         }
         try{//invoke afterMethod
           temp.afterMethod(testpkg.method);
@@ -179,8 +174,6 @@ public class Tester implements Runnable{
                                        +" method %s has failed",
                                        testpkg.method.toString()));
         }
-        count++;
-        println(count);
       }//end of for i : method loop
       classTests.add(tests);
     }
@@ -196,21 +189,22 @@ public class Tester implements Runnable{
    *does not make copies of the list).
    *@throws IllegalStateException - if the tester has not yet been run
    */
+  @SuppressWarnings("unchecked")
   public List<TestResult> getResults(){
-    ArrayList<Testpkg> results=new ArrayList<Testpkg>();
-    for (ArrayList<Testpkg> i : classTests){
-      results.addAll(i);}
-    return (List)results;
+    for(ArrayList<Testpkg> i: classTests){
+      results.addAll(i);
+    }
+    return results;
   }
   /**
    *Main Method
-   *Starts a console-based application. 
-   *Command line arguments are the names of the classes 
-   *to be tested. The application produces a summary output 
+   *Starts a console-based application.
+   *Command line arguments are the names of the classes
+   *to be tested. The application produces a summary output
    *of tests that succeeded and tests that failed.
    */
   public static void main(String[] args){
-    ArrayList<Class<? extends Testable>> argClasses=new ArrayList();
+    ArrayList<Class<? extends Testable>> argClasses=new ArrayList<>();
     if (args.length<=0 || args[0]=="-h" || args[0]=="--help"){
       println("Call with one or more names of testable classes");
       return;
@@ -239,17 +233,14 @@ public class Tester implements Runnable{
       return;
     }
     Tester testRun=new Tester(argClasses);
-    List<TestResult> results;
     println("Running");
     testRun.run();
     println("Has Run");
-    results=testRun.getResults();
-    for (TestResult i : results){
-      println(i.getWeight());
-      println(i.success());
-      println(i.getInfo());
-      println(i.getDuration());
-      println(i.error());
+    List<TestResult> main_results=testRun.getResults();
+    here();
+    for (TestResult i : main_results){
+      println("Weight: "+i.getWeight()+"\nSucceded: "+i.success()+"\nInfo: "
+              +i.getInfo()+"\nDuration: "+i.getDuration()+"\nError: "+i.error());
     }
     println("End of Main");
     return;

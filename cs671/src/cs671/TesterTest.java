@@ -24,7 +24,7 @@ public class TesterTest implements Testable{
     }
   }
   @Test(weight=1, info="null")
-  List nullTest(){return null;}
+  Object nullTest(){return null;}
   @Test(weight=0, info="weightless")
   void weightless() {return;}
   @Test(weight=-100, info="neg-weight")

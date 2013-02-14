@@ -1,5 +1,6 @@
 SOURCES := $(wildcard src/cs671/*.java src/cs671/*/*.java)
-#SOURCES1=something
+SOURCES1= src/cs671/Guesser.java src/cs671/GuesserTextUI.java\
+	src/cs671/HiLo.java src/cs671/Liar.java
 SOURCES2 := $(wildcard src/cs671/Test*.java)
 JAVAC ?= javac
 CLASSPATH ?=$PWD:$PWD/src/grader.jar
@@ -28,8 +29,7 @@ doc: html
 #             src/cs671/HiLo.java \
 #             src/cs671/Liar.java \
 #             src/cs671/TextUI.java # + other files, if needed
-# 1: $(SOURCES1)
-#	$(JAVAC) $?
-1: cs671
+1: $(SOURCES1)
+	$(JAVAC) $(JAVAC_FLAGS) $^
 2: $(SOURCES2)
 	$(JAVAC) $(JAVAC_FLAGS) $^
