@@ -24,7 +24,7 @@ vector mat_vec_mult(matrix A,vector x){
     return y;
   }
   else{
-   fprint("Bad Args");
+    printf("Bad Args");
    exit(-1);
   }
 }

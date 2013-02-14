@@ -102,7 +102,7 @@ am__v_AR_1 =
 libvec_math_a_AR = $(AR) $(ARFLAGS)
 libvec_math_a_LIBADD =
 am_libvec_math_a_OBJECTS = mat_vec_mult.$(OBJEXT) vec_add.$(OBJEXT) \
-	scalar_product.$(OBJEXT)
+	scalar_product.$(OBJEXT) vec_write.$(OBJEXT)
 libvec_math_a_OBJECTS = $(am_libvec_math_a_OBJECTS)
 PROGRAMS = $(bin_PROGRAMS)
 am_hello_OBJECTS = hello.$(OBJEXT) greeting.$(OBJEXT) \
@@ -263,10 +263,12 @@ top_srcdir = .
 lib_LIBRARIES = \
 	libvec_math.a
 
-vec_math_SOURCES = vec_math.c vec_math.h mat_vec_mult.c vec_add.c\
+vec_math_SOURCES = vec_math.c vec_math.h mat_vec_mult.c vec_add.c vec_write\
 	scalar_product.c scalar_product_test.c vec_add_test.c mat_vec_mult_test.c
 
-libvec_math_a_SOURCES = vec_math.h mat_vec_mult.c vec_add.c scalar_product.c
+libvec_math_a_SOURCES = vec_math.h mat_vec_mult.c vec_add.c\
+	scalar_product.c vec_write.c
+
 hello_SOURCES = hello.c hello.h greeting.c factorial.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -420,6 +422,7 @@ include ./$(DEPDIR)/scalar_product_test.Po
 include ./$(DEPDIR)/vec_add.Po
 include ./$(DEPDIR)/vec_add_test.Po
 include ./$(DEPDIR)/vec_math.Po
+include ./$(DEPDIR)/vec_write.Po
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -796,8 +799,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLIBRARIES
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS uninstall-libLIBRARIES
 
+lib:libvec_math.a
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-lib: libvec_math.a

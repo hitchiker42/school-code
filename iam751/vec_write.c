@@ -9,3 +9,5 @@ void vec_write(FILE* file,vector* vectors,int n){
     fprintf(file,"\n");
   }
 }
+
+

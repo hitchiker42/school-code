@@ -22,7 +22,7 @@ int vec_mult_test(int N,int M,FILE* file);
 void vec_write(FILE* file,vector* vectors,int n);
 //probably not the best practice to put this in the header file
 //but I don't know enough about cpp macros to make this into one
-void malloc_test(_Bool test){
+inline void malloc_test(_Bool test){
   if  (test){
       fprintf(stderr,"Memory Allocation Failed");
       raise(SIGSEGV);//maybe not the most elegnt way of dealing with this

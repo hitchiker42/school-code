@@ -18,7 +18,7 @@ int main(int argv,char** args){
   while ((c = getopt (argv, args, "asmhf:")) != -1){
     switch(c) {
     case 'f':
-      file=fopen(optarg,'w');
+      file=fopen(optarg,"w");
       break;
     case 'a':
       result=add_test(n,file);
