@@ -11,5 +11,6 @@ Date of inital commit: Jan 29, 2013
 Contains code for school classes, as of now only cs671 & iam751
 but should be fine to add any additional classes.
 
-Technically pubilc code, but I might just say its GPL licensed if I
-get around to it.
+cs671 has 2 java programs, a guessing game and a testing program
+
+iam751 has a simple hello program and a linear algebra libary with a test suite

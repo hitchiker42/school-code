@@ -54,6 +54,7 @@ iam751/missing
 iam751/config.*
 iam751/ar-lib
 iam751/stamp-h1
+iam751/.deps/*
 # Emacs  #
 ######################
 *~
