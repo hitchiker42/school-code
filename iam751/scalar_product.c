@@ -7,10 +7,16 @@
 // x: first vector
 // y: second vector
 
-double scalar_product(double *x, double *y,int n) {
-  double sum = 0.f;
-  for (int i = 0; i < n; i++) {
-    sum += x[i] * y[i];
+double scalar_product(vector x, vector y) {
+  if (x.len == y.len){
+    double sum = 0;
+    for (int i=0;i<x.len;i++) {
+      sum += x.vals[i]*y.vals[i];
+    }
+    return sum;
   }
-  return sum;
+  else{
+    printf("vectors must be the same length\n");
+    exit(-1);
+  }
 }

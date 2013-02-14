@@ -2,16 +2,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "vec_math.h"
-#define N 3
-int add_test(int argv,char** args){
-  if (argv == 3){
-    char * q;
-    int n=strtol(args[2],&q,10);
-    double *a=(double*)malloc(n*sizeof(double));
-    double *b=(double*)malloc(n*sizeof(double));
-    double *c=(double*)malloc(n*sizeof(double));
-    if (a == NULL || b == NULL){
-      exit(5);
+int add_test(int N){
+    vector a=(malloc(N*sizeof(double)),N);
+    double *b=malloc(N*sizeof(double));
+    double *c=malloc(N*sizeof(double));
+    malloc_test(a.vals==NULL || b.vals==NULL || c.vals==NULL);
     } else {
       for (int i=0; i<n; i++){
         a[i]=(double)i;

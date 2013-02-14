@@ -9,12 +9,12 @@ vector vec_add(vector x,vector y){
     vector z={sum,x.len};
     for (int i=0;i<x.len;i++){
       z.vals[i]=0;
-      z.vals[i]=x.vals[i]+y.vals[i];
+      z[i]=x.vals[i]+y.vals[i];
     }
     return z;
   }
   else{
     printf("Error: vectors must be same size");
-    exit(-1);
+    return 0;
   }
 }

@@ -6,6 +6,7 @@
 *.exe
 *.o
 *.so
+*.a
 
 # Packages #
 ############
@@ -51,6 +52,8 @@ iam751/depcomp
 iam751/install-sh
 iam751/missing
 iam751/config.*
+iam751/ar-lib
+iam751/stamp-h1
 # Emacs  #
 ######################
 *~
