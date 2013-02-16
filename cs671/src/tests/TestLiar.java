@@ -344,7 +344,6 @@ class TestLiar {
   }
 
   // Big tests
-
   @Test(timeout=5000,val=2) void testBig1 () {
     testBig(242, 1000, 1000, .1);
   }
@@ -371,7 +370,7 @@ class TestLiar {
 
   @Test(timeout=1800000,val=1) void testBig7 () {
     testBig(14242, 20000, 10000, .1);
-  }
+    }
 
   void testBig (int n, int s, int l, double d) {
     Integer target = Integer.valueOf(n);

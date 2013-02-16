@@ -18,6 +18,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
   private boolean init=false;
   private boolean qmade=false;
   private boolean solved=false;
+  int asked=0;
+  static int min(int a,int b){
+    return(a<b ? a : b);
+  }
   //This is just a macro for myself, to make printing eaiser
   //mainly for debugging
   private static void println(String arg){
@@ -42,7 +46,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
    *@return true iff the problem has been solved
    */
   public boolean hasSolved(){
-    if(init != true){
+    if(!init){
       throw(new IllegalStateException());
     }
     return liarTable.hasSolved();
@@ -57,6 +61,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
      *problem
    */
   public double progress(){
+    if (solved==true){
+      return 1.0;
+    }
     return(1-(liarTable.progress()/liarTable.total));
   }
 
@@ -116,6 +123,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     TreeMap<Integer,ArrayList<T>> bottom;
     TreeMap<Integer,ArrayList<T>> liarList;
     double total;//# of total lies at star
+    double sum_last=total;
     /**
      *LiarTable Constructor<br>
     */
@@ -125,10 +133,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       this.top.put(0,new ArrayList<T>(candidates.subList(0,items/2)));
       this.bottom.put(0,new ArrayList<T>(candidates.subList(items/2,items)));
       for (int i=1;i<=lies;i++){
-        this.top.put(i,new ArrayList<T>(items/2+items%2));
-        this.bottom.put(i,new ArrayList<T>(items/2+items%2));
+        this.top.put(i,new ArrayList<T>());
+        this.bottom.put(i,new ArrayList<T>());
       }
-      this.total=items*lies;
+      this.total=items*(lies+1);
       //println(this.top.toString()+this.bottom.toString()+'\n');
     }
 
@@ -149,7 +157,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
         liarList=top;
       }
       ArrayList<T> temp;
-      for (int i=maxLies;i>0;i--){
+      for (int i=min(maxLies,asked);i>0;i--){
         try{
           //warnings suppressed for this,we're casting a clone of
           //an ArrayList<T> into an ArrayList<T>, so it should
@@ -182,7 +190,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       ArrayList<T> down;
       ArrayList<T> temp;
       boolean up_put=false;
-      for (int i=0;i<=maxLies;i++){
+      for (int i=0;i<=min(maxLies,asked);i++){
         up=top.get(i);
         down=bottom.get(i);
         temp=new ArrayList<>(up.size());
@@ -215,11 +223,18 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     */
     double progress(){
       //sum lies left per object over all objects
-      double sum=0;
-      for(int i=0;i<=maxLies;i++){
-        sum += top.get(i).size()*(maxLies-i);
-        sum += bottom.get(i).size()*(maxLies-i);
+      if(!init){
+        throw new IllegalStateException();
       }
+      double sum=0;
+      for(int i=0;i<=min(maxLies,asked);i++){
+        sum += top.get(i).size()*(maxLies-(i-1));
+        sum += bottom.get(i).size()*(maxLies-(i-1));
+      }
+      if(sum==sum_last){
+        sum-=.5;
+      }
+      sum_last=sum;
       return sum;
     }
 
@@ -298,7 +313,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       throw(new IllegalStateException());
     }
     Secret<T> ans=null;
-    for (int i=0;i<=maxLies;i++){
+    for (int i=0;i<=min(maxLies,asked);i++){
       if (!liarTable.top.get(i).isEmpty()){
         ans=new Secret<>(i,liarTable.top.get(i).get(0));
         break;
@@ -319,6 +334,9 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     //reset liarTable
     this.liarTable=new LiarTable(this.candidates,maxLies);
     init=true;
+    if (candidates.size() == 1){
+      solved=true;
+    }
     return "";
   }
 
@@ -332,14 +350,15 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       throw(new IllegalStateException());
     }
     StringBuilder question = new StringBuilder(String.format("Is the secret %s among ",name));
-    for (ArrayList<T> i:liarTable.top.values()){
+    question.append(liarTable.top.values());
+    /*for (ArrayList<T> i:liarTable.top.values()){
       Iterator<T> q = i.iterator();
       while (q.hasNext()){
         question.append(q.next());
         question.append(' ');
       }
-    }
-    question.deleteCharAt(question.length()-1);
+    }*/
+    //question.deleteCharAt(question.length()-1);
     question.append('?');
     qmade=true;
     return question.toString();
@@ -353,6 +372,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     }
     //add 1 lie to each entry in top and remove any with lies>maxlies
     qmade=false;
+    asked ++;
     liarTable.increment(false);
     liarTable.swap();
   }
@@ -365,9 +385,10 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
       throw(new IllegalStateException());
     }
     //add 1 lie to each entry in bottom and remove any with lies>maxlies
+    qmade=false;
+    asked ++;
     liarTable.increment(true);
     liarTable.swap();
-    qmade=false;
   }
   /**
    *Sets an upper bound on the number of objects to be used in the guessing
@@ -388,8 +409,11 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
    *few elements from this set (e.g., 10 words, chosen randomly). 
    */
   public int selectCandidates(int n){
+    if(init){
+      throw new IllegalStateException();
+    }
     if (n<=0){
-      return -1;
+      throw new IllegalArgumentException();
     } else if (n>=candidates.size()){
       return candidates.size();
     }
