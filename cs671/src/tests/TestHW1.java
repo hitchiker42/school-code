@@ -10,7 +10,8 @@ class TestHW1{
     public static void main (String[] args) throws Exception {
         java.util.logging.Logger.getLogger("charpov.grader")
           .setLevel(java.util.logging.Level.WARNING);
-        Tester tester = new Tester(TestGuesserTextUI.class, TestHiLo.class, TestLiar.class);
+        Tester tester = new Tester(TestHiLo.class);
+          //new Tester(TestGuesserTextUI.class, TestHiLo.class, TestLiar.class);
 	FileOutputStream fos = new FileOutputStream("../run1.out");
         tester.setOutputStream(fos);
         double result = tester.call();

@@ -66,7 +66,7 @@ public class Liar<T> implements Guesser<Liar.Secret<T>>{
     /**
      *The type of secrets produced by this guesser. Secrets are simply a pair:
      *secret object and number of times the user lied. 
-     *@param<E> E - the type of secret objects, which is T, the type parameter
+     *@param E - the type of secret objects, which is T, the type parameter
      *of the Liar class. 
    */
   public static class Secret<E> {

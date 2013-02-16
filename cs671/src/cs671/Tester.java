@@ -45,7 +45,7 @@ public class Tester implements Runnable{
    *Sets the tester output. By default, the output is System.err.
    * It is valid to set the output to null,
    * in which case the tester is completely silent.
-   *@param w - the output for the tester info; can be null
+   *@param W - the output for the tester info; can be null
    */
   public void setPrintWriter(PrintWriter W){output=W;}
     /**

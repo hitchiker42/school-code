@@ -48,7 +48,7 @@ public class HiLo implements Guesser<Integer> {
     this.max=max;
     this.min=min;
     range= new Range(min,max);
-    this.x=(int)((long)min+(long)max)/2;
+    this.x=(int)(((long)min+(long)max)/2+((long)min+(long)max)%2);
     this.total=(double)((long)max-(long)min);
   }
   /**
@@ -99,12 +99,12 @@ public class HiLo implements Guesser<Integer> {
       throw new IllegalStateException();
     }
     qmade=true;
-    x=(int)(((long)min + (long)max)/2+((long)min + (long)max)%2); //rounds up
+    x=(int)(((long)min + (long)max)/2);//+((long)min + (long)max)%2); //rounds up
     if(min<0 || max<0){
       x=(int)((long)min + (long)max)/2;
     }
     String question=String.format("Is your number larger than %d",x);
-    return question;
+     return question;
   }
   /**
    *{@inheritDoc}
@@ -114,7 +114,7 @@ public class HiLo implements Guesser<Integer> {
       throw new IllegalStateException();
     }
     qmade=false;
-    this.max=(x-1);
+    this.max=x;
     //negitive numbers only
     if (Math.abs(max)>Math.abs(Range.min) && max<0){
       max=Range.min;
@@ -128,7 +128,7 @@ public class HiLo implements Guesser<Integer> {
       throw new IllegalStateException();
     }
     qmade=false;
-    this.min=x;
+    this.min=(x+1);
   }
   /**
    *Indicates progress towards solving the problem. After initialization, the
@@ -145,6 +145,9 @@ public class HiLo implements Guesser<Integer> {
     //but it works and so thats the way I'm leaving it.
     if (init!=true){
       throw new IllegalStateException();
+    }
+    if (min==max){
+      return(1.0);
     }
     Double current=(double)((long)max-(long)min);
     return(1-current/total);
