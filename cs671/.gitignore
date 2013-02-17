@@ -66,3 +66,4 @@ Makefile.in
 
 # This dir#
 Misc_Files/*
+.svn
