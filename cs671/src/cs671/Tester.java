@@ -2,6 +2,7 @@
 package cs671;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.*;
 import java.io.*;
 import static cs671.Debug.*;
 //Testable is for classes
@@ -62,6 +63,7 @@ public class Tester implements Runnable{
        */
       Testpkg(Method method,double weight,String info){
         this.method=method;this.weight=weight;this.info=info;
+        this.success=false;this.duration=0.0;this.error=null;this.returned=null;
       }
       public double getWeight(){return weight;}
       public boolean success(){return success;}
@@ -69,6 +71,39 @@ public class Tester implements Runnable{
       public double getDuration(){return duration;}
       public Throwable error(){return error;}
     }
+  /**
+     Creates a subprocess to call the java decompilier on the given java class
+     in order to get the correct order for methods for the run method.
+   */
+  public static ArrayList<String> getMethods(String className) {
+    ProcessBuilder decomp=new ProcessBuilder("javap","-p",className);
+    decomp.redirectErrorStream(true);
+    ArrayList<String> methods=new ArrayList<>();
+    Process javap;
+    try {
+      javap = decomp.start();
+    } catch (IOException ex){
+      methods.add("Class Not Found");
+      return methods;
+    }
+    Scanner stdin = new Scanner(javap.getInputStream());
+    Pattern p=Pattern.compile(".*\\x28.*\\x29.*;");
+    String method=null;
+    while(stdin.hasNextLine()){
+      method=stdin.findInLine(p);
+      if(method==null){
+        stdin.nextLine();
+      }
+      else {
+        methods.add(method);
+        //here(method);
+      }
+      method=null;
+    }
+    methods.remove("public boolean beforeMethod (Method m) throws Exception");
+    methods.remove("public void afterMethod (Method m) throws Exception");
+    return methods;
+  }
   ArrayList<ArrayList<Testpkg>> classTests=new ArrayList<>();
   /**
    *Run Method
@@ -89,10 +124,21 @@ public class Tester implements Runnable{
    */
   public void run(){
     for(Class<? extends Testable> foo : classes){
-      ArrayList<Testpkg> tests=new ArrayList<Testpkg>();
-      Testable temp;
+        ArrayList<Testpkg> tests=new ArrayList<Testpkg>();
+        Testable temp;
+        ArrayList<Method> methods=new ArrayList<>();
+        ArrayList<String> names=Tester.getMethods(foo.getCanonicalName());
+      //this will need to be fixed to account for methods with identical names etc
+      for ( String i : names){
+        for ( Method j : foo.getDeclaredMethods()){
+          if (i.matches(".*"+j.getName()+".*")){
+            methods.add(j);
+            break;
+          }
+        }
+      }
       //do we need this test?(test if class is testable)
-      for (Method meth : foo.getDeclaredMethods()){
+      for (Method meth : methods){
         try{
           meth.setAccessible(true);
         } catch(SecurityException ex){
@@ -126,6 +172,7 @@ public class Tester implements Runnable{
             assert(fields.contains(annotate.weight()));
             assert(fields.contains(annotate.info()));
             tests.add(new Testpkg(meth,annotate.weight(),annotate.info()));
+            //here(String.valueOf(meth));
           }
           catch(IllegalArgumentException |
                 NullPointerException | ClassCastException ex){
@@ -134,18 +181,18 @@ public class Tester implements Runnable{
           }
         }
       }
+      try {//try to instancate object
+        println("Testing");
+        //Constructor cons=foo.getConstructor();
+        temp=(Testable)foo.newInstance();
+      }
+      catch(InstantiationException | IllegalAccessException
+            | LinkageError ex){
+        trace(ex);
+        output.println(String.format("Error Could not instantiate %s",
+                                     foo.toString()));
+        continue;}
       for(Testpkg testpkg : tests){
-        try {//try to instancate object
-          println("Testing");
-          //Constructor cons=foo.getConstructor();
-          temp=(Testable)foo.newInstance();
-        }
-        catch(InstantiationException | IllegalAccessException
-              | LinkageError ex){
-          trace(ex);
-          output.println(String.format("Error Could not instantiate %s",
-                                       foo.toString()));
-          break;}
         if(testpkg.weight <=0){continue;}
         try{//invoke beforeMethod
           boolean check=temp.beforeMethod(testpkg.method);
@@ -190,7 +237,11 @@ public class Tester implements Runnable{
    *@throws IllegalStateException - if the tester has not yet been run
    */
   @SuppressWarnings("unchecked")
+
   public List<TestResult> getResults(){
+    if (!hasrun){
+      throw new IllegalStateException();
+    }
     for(ArrayList<Testpkg> i: classTests){
       results.addAll(i);
     }
@@ -237,7 +288,7 @@ public class Tester implements Runnable{
     testRun.run();
     println("Has Run");
     List<TestResult> main_results=testRun.getResults();
-    here();
+    //here();
     for (TestResult i : main_results){
       println("Weight: "+i.getWeight()+"\nSucceded: "+i.success()+"\nInfo: "
               +i.getInfo()+"\nDuration: "+i.getDuration()+"\nError: "+i.error());

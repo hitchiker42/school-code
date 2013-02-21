@@ -1,0 +1,9 @@
+Notes:
+    X86_64 processors have several instruction sets, general purpose
+        instructions,x87 fp instructions, MMX instructions SSE instructions
+        SSE2 instructions, SSE3,SSSE3 &SSE4 instructions & AVX instructions
+        (maybe more?).
+    MMX registers aliased to x87 registers, no floating point calculations
+        at the same time as MXX calculations
+    Small data used, lots of small calculations, have 2 overflow modes,
+        saturated or wraparound

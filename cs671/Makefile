@@ -36,7 +36,7 @@ doc: html
 	$(JAVAC) $(JAVAC_FLAGS) $^
 2: JAVAC_FLAGS += $(DEBUG)
 2: $(SOURCES2)
-
+	$(JAVAC) $(JAVAC_FLAGS) $^
 3: JAVAC_FLAGS += $(DEBUG)
 3: $(SOURCES3)
 	$(JAVAC) $(JAVAC_FLAGS) $^
