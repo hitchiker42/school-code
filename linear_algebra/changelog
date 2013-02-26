@@ -1,0 +1,8 @@
+I added in some code to the test data layout file to make the double pointer
+function work. I created a new double pointer which just gives a new view to the
+underlying data in the matrix A. I also added in a few asserts to the matrix.c
+file. I'm not sure what we're really supposed to do for this homework, beyond
+understanding the idea of pointers and structs and the like. There is one
+problem with the code, for whatever reason, on my computer at least, the test
+data layout code with the fortran added gets a segfault, only after everything
+has printed out though, which is a bit odd.
